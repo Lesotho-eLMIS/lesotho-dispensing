@@ -13,38 +13,31 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.domain.patient;
+package org.openlmis.dispensing.dto.patient;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.BaseEntity;
+import org.openlmis.dispensing.domain.patient.Contact;
 
-@Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "medical_history", schema = "dispensing")
-public class MedicalHistory extends BaseEntity {
-  private String type;
-  private String history;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "patientId", nullable = false)
-  private Patient patient;
+@NoArgsConstructor
+@Builder
+public class ContactDto {
+  private String contactType;
+  private String contacts;
 
   /**
-   * Constructor for MedicalHistory.
+   * Convert dto to jpa model.
    *
+   * @return the converted jpa model object.
    */
-  public MedicalHistory(String type, String history) {
-    this.type = type;
-    this.history = history;
-    // patient can be set later or remain null
+  public Contact toContact() {
+    Contact contact = new Contact(
+        contactType, contacts
+    );
+    return contact;
   }
 }

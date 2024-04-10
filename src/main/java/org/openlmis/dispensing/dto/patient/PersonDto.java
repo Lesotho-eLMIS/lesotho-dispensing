@@ -13,25 +13,24 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.domain.patient;
+package org.openlmis.dispensing.dto.patient;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.BaseEntity;
+import org.openlmis.dispensing.domain.patient.Contact;
+import org.openlmis.dispensing.domain.patient.Person;
 
-@Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "person", schema = "dispensing")
-public class Person extends BaseEntity {
+@NoArgsConstructor
+@Builder
+public class PersonDto {
   private String firstName;
   private String lastName;
   private String nickName;
@@ -45,7 +44,32 @@ public class Person extends BaseEntity {
   private String motherMaidenName;
   private Boolean deceased;
   private Boolean retired;
-  @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<Contact> contacts;
-  //dates for events needed?? e.g. deceased, retired, created, etc.
+  private Set<ContactDto> contacts;
+
+  /**
+   * Convert dto to jpa model.
+   *
+   * @return the converted jpa model object.
+   */
+  public Person toPerson() {
+    Person person = new Person(
+        firstName, lastName, nickName, nationalId, sex, dateOfBirth,
+        isDoBEstimated, physicalAddress, nextOfKinFullName, nextOfKinContact,
+        motherMaidenName, deceased, retired, contacts()
+    );
+    return person;
+  }
+
+  /**
+   * Gets contacts as {@link Contact}.
+   */
+  public Set<Contact> contacts() {
+    if (null == contacts) {
+      return Collections.emptySet();
+    }
+
+    return contacts.stream()
+                   .map(contactDto -> contactDto.toContact())
+                   .collect(Collectors.toSet());
+  }
 }

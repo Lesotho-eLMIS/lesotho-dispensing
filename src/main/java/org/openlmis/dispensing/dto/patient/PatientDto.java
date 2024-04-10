@@ -13,33 +13,50 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.domain.patient;
+package org.openlmis.dispensing.dto.patient;
 
+import java.util.Collections;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.BaseEntity;
+import org.openlmis.dispensing.domain.patient.MedicalHistory;
+import org.openlmis.dispensing.domain.patient.Patient;
 
-@Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "patient", schema = "dispensing")
-public class Patient extends BaseEntity {
-
+@NoArgsConstructor
+@Builder
+public class PatientDto {
   private String patientNumber;
+  private PersonDto personDto;
+  private Set<MedicalHistoryDto> medicalHistory;
 
-  @OneToOne
-  @JoinColumn(name = "personId", referencedColumnName = "id")
-  private Person person;
+  /**
+   * Convert dto to jpa model.
+   *
+   * @return the converted jpa model object.
+   */
+  public Patient toPatient() {
+    Patient patient = new Patient(
+        patientNumber, personDto.toPerson(), medicalHistory()
+    );
+    return patient;
+  }
 
-  @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<MedicalHistory> medicalHistory;
+  /**
+   * Gets medical history as {@link MedicalHistory}.
+   */
+  public Set<MedicalHistory> medicalHistory() {
+    if (null == medicalHistory) {
+      return Collections.emptySet();
+    }
+
+    return 
+      medicalHistory.stream()
+                    .map(medicalHistoryDto -> medicalHistoryDto.toMedicalHistory())
+                    .collect(Collectors.toSet());
+  }
 }
