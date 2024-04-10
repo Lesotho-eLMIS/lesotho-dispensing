@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.pointofdelivery.service;
+package org.openlmis.dispensing.service;
 
 import static java.time.ZoneOffset.UTC;
 import static java.time.ZonedDateTime.of;
@@ -40,23 +40,23 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openlmis.pointofdelivery.BaseIntegrationTest;
-import org.openlmis.pointofdelivery.domain.card.StockCard;
-import org.openlmis.pointofdelivery.domain.card.StockCardLineItem;
-import org.openlmis.pointofdelivery.domain.event.CalculatedStockOnHand;
-import org.openlmis.pointofdelivery.domain.event.StockEvent;
-import org.openlmis.pointofdelivery.dto.StockCardDto;
-import org.openlmis.pointofdelivery.dto.referencedata.FacilityDto;
-import org.openlmis.pointofdelivery.dto.referencedata.OrderableDto;
-import org.openlmis.pointofdelivery.dto.referencedata.ProgramDto;
-import org.openlmis.pointofdelivery.repository.CalculatedStockOnHandRepository;
-import org.openlmis.pointofdelivery.repository.StockCardRepository;
-import org.openlmis.pointofdelivery.repository.StockEventsRepository;
-import org.openlmis.pointofdelivery.service.referencedata.FacilityReferenceDataService;
-import org.openlmis.pointofdelivery.service.referencedata.LotReferenceDataService;
-import org.openlmis.pointofdelivery.service.referencedata.OrderableReferenceDataService;
-import org.openlmis.pointofdelivery.service.referencedata.ProgramReferenceDataService;
-import org.openlmis.pointofdelivery.testutils.StockEventDataBuilder;
+import org.openlmis.dispensing.BaseIntegrationTest;
+import org.openlmis.dispensing.domain.card.StockCard;
+import org.openlmis.dispensing.domain.card.StockCardLineItem;
+import org.openlmis.dispensing.domain.event.CalculatedStockOnHand;
+import org.openlmis.dispensing.domain.event.StockEvent;
+import org.openlmis.dispensing.dto.StockCardDto;
+import org.openlmis.dispensing.dto.referencedata.FacilityDto;
+import org.openlmis.dispensing.dto.referencedata.OrderableDto;
+import org.openlmis.dispensing.dto.referencedata.ProgramDto;
+import org.openlmis.dispensing.repository.CalculatedStockOnHandRepository;
+import org.openlmis.dispensing.repository.StockCardRepository;
+import org.openlmis.dispensing.repository.StockEventsRepository;
+import org.openlmis.dispensing.service.referencedata.FacilityReferenceDataService;
+import org.openlmis.dispensing.service.referencedata.LotReferenceDataService;
+import org.openlmis.dispensing.service.referencedata.OrderableReferenceDataService;
+import org.openlmis.dispensing.service.referencedata.ProgramReferenceDataService;
+import org.openlmis.dispensing.testutils.StockEventDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;

@@ -13,17 +13,17 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.pointofdelivery.repository;
+package org.openlmis.dispensing.repository;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.openlmis.pointofdelivery.testutils.StockCardTemplateDataBuilder.createTemplate;
+import static org.openlmis.dispensing.testutils.StockCardTemplateDataBuilder.createTemplate;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openlmis.pointofdelivery.domain.template.AvailableStockCardFields;
-import org.openlmis.pointofdelivery.domain.template.AvailableStockCardLineItemFields;
-import org.openlmis.pointofdelivery.domain.template.StockCardTemplate;
+import org.openlmis.dispensing.domain.template.AvailableStockCardFields;
+import org.openlmis.dispensing.domain.template.AvailableStockCardLineItemFields;
+import org.openlmis.dispensing.domain.template.StockCardTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;

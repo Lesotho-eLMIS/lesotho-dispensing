@@ -13,10 +13,10 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.pointofdelivery.validator;
+package org.openlmis.dispensing.validator;
 
-import static org.openlmis.pointofdelivery.i18n.MessageKeys.ERROR_EVENT_ADJUSTMENT_REASON_CATEGORY_INVALID;
-import static org.openlmis.pointofdelivery.i18n.MessageKeys.ERROR_EVENT_ADJUSTMENT_REASON_TYPE_INVALID;
+import static org.openlmis.dispensing.i18n.MessageKeys.ERROR_EVENT_ADJUSTMENT_REASON_CATEGORY_INVALID;
+import static org.openlmis.dispensing.i18n.MessageKeys.ERROR_EVENT_ADJUSTMENT_REASON_TYPE_INVALID;
 
 import java.util.UUID;
 import org.junit.Before;
@@ -24,15 +24,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.openlmis.pointofdelivery.BaseIntegrationTest;
-import org.openlmis.pointofdelivery.domain.reason.ReasonCategory;
-import org.openlmis.pointofdelivery.domain.reason.ReasonType;
-import org.openlmis.pointofdelivery.domain.reason.StockCardLineItemReason;
-import org.openlmis.pointofdelivery.dto.StockEventDto;
-import org.openlmis.pointofdelivery.exception.ValidationMessageException;
-import org.openlmis.pointofdelivery.repository.StockCardLineItemReasonRepository;
-import org.openlmis.pointofdelivery.testutils.StockEventDtoDataBuilder;
-import org.openlmis.pointofdelivery.validators.DefaultAdjustmentReasonValidator;
+import org.openlmis.dispensing.BaseIntegrationTest;
+import org.openlmis.dispensing.domain.reason.ReasonCategory;
+import org.openlmis.dispensing.domain.reason.ReasonType;
+import org.openlmis.dispensing.domain.reason.StockCardLineItemReason;
+import org.openlmis.dispensing.dto.StockEventDto;
+import org.openlmis.dispensing.exception.ValidationMessageException;
+import org.openlmis.dispensing.repository.StockCardLineItemReasonRepository;
+import org.openlmis.dispensing.testutils.StockEventDtoDataBuilder;
+import org.openlmis.dispensing.validators.DefaultAdjustmentReasonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
