@@ -15,6 +15,7 @@
 
 package org.openlmis.dispensing.dto.patient;
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +27,7 @@ import org.openlmis.dispensing.domain.patient.Contact;
 @NoArgsConstructor
 @Builder
 public class ContactDto {
+  private UUID id;
   private String contactType;
   private String contacts;
 

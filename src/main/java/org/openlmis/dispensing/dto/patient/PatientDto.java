@@ -17,6 +17,7 @@ package org.openlmis.dispensing.dto.patient;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,7 @@ import org.openlmis.dispensing.domain.patient.Patient;
 @NoArgsConstructor
 @Builder
 public class PatientDto {
+  private UUID id;
   private String patientNumber;
   private PersonDto personDto;
   private Set<MedicalHistoryDto> medicalHistory;

@@ -18,6 +18,7 @@ package org.openlmis.dispensing.dto.patient;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,6 +32,7 @@ import org.openlmis.dispensing.domain.patient.Person;
 @NoArgsConstructor
 @Builder
 public class PersonDto {
+  private UUID id;
   private String firstName;
   private String lastName;
   private String nickName;
