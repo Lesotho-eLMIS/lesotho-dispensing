@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.pointofdelivery.web.stockcardsummariesv2;
+package org.openlmis.dispensing.web.stockcardsummariesv2;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -28,16 +28,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.pointofdelivery.exception.PermissionMessageException;
-import org.openlmis.pointofdelivery.service.StockCardSummaries;
-import org.openlmis.pointofdelivery.service.StockCardSummariesService;
-import org.openlmis.pointofdelivery.service.StockCardSummariesV2SearchParams;
-import org.openlmis.pointofdelivery.testutils.CanFulfillForMeEntryDtoDataBuilder;
-import org.openlmis.pointofdelivery.testutils.ObjectGenerator;
-import org.openlmis.pointofdelivery.testutils.StockCardSummariesV2SearchParamsDataBuilder;
-import org.openlmis.pointofdelivery.testutils.StockCardSummaryV2DtoDataBuilder;
-import org.openlmis.pointofdelivery.util.Message;
-import org.openlmis.pointofdelivery.web.BaseWebTest;
+import org.openlmis.dispensing.exception.PermissionMessageException;
+import org.openlmis.dispensing.service.StockCardSummaries;
+import org.openlmis.dispensing.service.StockCardSummariesService;
+import org.openlmis.dispensing.service.StockCardSummariesV2SearchParams;
+import org.openlmis.dispensing.testutils.CanFulfillForMeEntryDtoDataBuilder;
+import org.openlmis.dispensing.testutils.ObjectGenerator;
+import org.openlmis.dispensing.testutils.StockCardSummariesV2SearchParamsDataBuilder;
+import org.openlmis.dispensing.testutils.StockCardSummaryV2DtoDataBuilder;
+import org.openlmis.dispensing.util.Message;
+import org.openlmis.dispensing.web.BaseWebTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

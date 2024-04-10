@@ -13,13 +13,13 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.pointofdelivery.service;
+package org.openlmis.dispensing.service;
 
 import static java.util.UUID.randomUUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static org.openlmis.pointofdelivery.testutils.DatesUtil.getBaseDate;
+import static org.openlmis.dispensing.testutils.DatesUtil.getBaseDate;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -34,24 +34,24 @@ import javax.transaction.Transactional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openlmis.pointofdelivery.BaseIntegrationTest;
-import org.openlmis.pointofdelivery.domain.card.StockCard;
-import org.openlmis.pointofdelivery.domain.card.StockCardLineItem;
-import org.openlmis.pointofdelivery.domain.event.CalculatedStockOnHand;
-import org.openlmis.pointofdelivery.domain.event.StockEvent;
-import org.openlmis.pointofdelivery.domain.reason.StockCardLineItemReason;
-import org.openlmis.pointofdelivery.dto.referencedata.OrderableDto;
-import org.openlmis.pointofdelivery.exception.ValidationMessageException;
-import org.openlmis.pointofdelivery.repository.CalculatedStockOnHandRepository;
-import org.openlmis.pointofdelivery.repository.StockCardLineItemReasonRepository;
-import org.openlmis.pointofdelivery.repository.StockCardLineItemRepository;
-import org.openlmis.pointofdelivery.repository.StockCardRepository;
-import org.openlmis.pointofdelivery.repository.StockEventsRepository;
-import org.openlmis.pointofdelivery.service.referencedata.OrderableReferenceDataService;
-import org.openlmis.pointofdelivery.testutils.CalculatedStockOnHandDataBuilder;
-import org.openlmis.pointofdelivery.testutils.StockCardDataBuilder;
-import org.openlmis.pointofdelivery.testutils.StockCardLineItemDataBuilder;
-import org.openlmis.pointofdelivery.testutils.StockEventDataBuilder;
+import org.openlmis.dispensing.BaseIntegrationTest;
+import org.openlmis.dispensing.domain.card.StockCard;
+import org.openlmis.dispensing.domain.card.StockCardLineItem;
+import org.openlmis.dispensing.domain.event.CalculatedStockOnHand;
+import org.openlmis.dispensing.domain.event.StockEvent;
+import org.openlmis.dispensing.domain.reason.StockCardLineItemReason;
+import org.openlmis.dispensing.dto.referencedata.OrderableDto;
+import org.openlmis.dispensing.exception.ValidationMessageException;
+import org.openlmis.dispensing.repository.CalculatedStockOnHandRepository;
+import org.openlmis.dispensing.repository.StockCardLineItemReasonRepository;
+import org.openlmis.dispensing.repository.StockCardLineItemRepository;
+import org.openlmis.dispensing.repository.StockCardRepository;
+import org.openlmis.dispensing.repository.StockEventsRepository;
+import org.openlmis.dispensing.service.referencedata.OrderableReferenceDataService;
+import org.openlmis.dispensing.testutils.CalculatedStockOnHandDataBuilder;
+import org.openlmis.dispensing.testutils.StockCardDataBuilder;
+import org.openlmis.dispensing.testutils.StockCardLineItemDataBuilder;
+import org.openlmis.dispensing.testutils.StockEventDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
