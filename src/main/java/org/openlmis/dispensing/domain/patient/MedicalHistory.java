@@ -16,6 +16,7 @@
 package org.openlmis.dispensing.domain.patient;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -33,7 +34,17 @@ public class MedicalHistory extends BaseEntity {
   private String type;
   private String history;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "patientId", nullable = false)
   private Patient patient;
+
+  /**
+   * Constructor for MedicalHistory.
+   *
+   */
+  public MedicalHistory(String type, String history) {
+    this.type = type;
+    this.history = history;
+    // patient can be set later or remain null
+  }
 }

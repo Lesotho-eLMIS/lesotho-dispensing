@@ -15,9 +15,11 @@
 
 package org.openlmis.dispensing.domain.patient;
 
+import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -34,7 +36,10 @@ public class Patient extends BaseEntity {
 
   private String patientNumber;
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @OneToOne
   @JoinColumn(name = "personId", referencedColumnName = "id")
   private Person person;
+
+  @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<MedicalHistory> medicalHistory;
 }
