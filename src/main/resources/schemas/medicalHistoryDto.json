@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Medical History Data Transfer Object",
+  "description": "A DTO that represents a patient's medical history record.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier of the medical history record."
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of medical history entry (e.g., diagnosis, treatment)."
+    },
+    "history": {
+      "type": "string",
+      "description": "A detailed description of the medical history entry."
+    },
+    "patientId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier of the patient to whom this record belongs."
+    },
+    "dateRecorded": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date and time when this record was created or recorded."
+    }
+  },
+  "required": ["id", "type", "history", "patientId", "dateRecorded"]
+}

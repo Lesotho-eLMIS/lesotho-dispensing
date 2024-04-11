@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Person Data Transfer Object",
+  "description": "A DTO that represents a person's details.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier of the person."
+    },
+    "nationalId": {
+      "type": "string",
+      "description": "The national ID of the person."
+    },
+    "firstName": {
+      "type": "string",
+      "description": "The first name of the person."
+    },
+    "lastName": {
+      "type": "string",
+      "description": "The last name of the person."
+    },
+    "dateOfBirth": {
+      "type": "string",
+      "format": "date",
+      "description": "The date of birth of the person."
+    },
+    "contacts": {
+      "type": "array",
+      "description": "A list of contacts associated with the person.",
+      "items": {
+        "$ref": "#/definitions/contactDto"
+      }
+    }
+  },
+  "required": ["id", "nationalId", "firstName", "lastName", "dateOfBirth"],
+  "definitions": {
+    "contactDto": {
+      "type": "object",
+      "properties": {
+        "contactType": {
+          "type": "string",
+          "description": "The type of the contact information."
+        },
+        "contactValue": {
+          "type": "string",
+          "description": "The contact information."
+        },
+        "personId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier of the associated person."
+        }
+      },
+      "required": ["contactType", "contactValue"]
+    }
+  }
+}

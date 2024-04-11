@@ -27,6 +27,7 @@ schemas:
            "items": { "type": "object", "$ref": "schemas/reason.json" }
        }
   - geographicZone: !include schemas/geographicZone.json
+  - patientDto: !include schemas/patientDto.json
   - pointOfDeliveryEventDto: !include schemas/pointOfDeliveryEventDto.json
   - pointOfDeliveryEventDtos: |
         {
@@ -156,7 +157,7 @@ traits:
                 repeat: true
 
 /api:
-  /podEvents:
+  /patient:
       get:
         is: [ secured ]
         description: Get a list of point of delivery events
@@ -192,7 +193,7 @@ traits:
         description: Create a new point of delivery event.
         body:
           application/json:
-            schema: pointOfDeliveryEventDto
+            schema: patientDto
 
         responses:
           201:
