@@ -16,7 +16,7 @@
 package org.openlmis.dispensing.domain.patient;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -45,7 +45,8 @@ public class Person extends BaseEntity {
   private String motherMaidenName;
   private Boolean deceased;
   private Boolean retired;
+
   @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<Contact> contacts;
+  private List<Contact> contacts;
   //dates for events needed?? e.g. deceased, retired, created, etc.
 }

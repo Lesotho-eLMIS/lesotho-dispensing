@@ -16,7 +16,6 @@
 package org.openlmis.dispensing.domain.patient;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -33,19 +32,19 @@ import org.openlmis.dispensing.domain.BaseEntity;
 public class Contact extends BaseEntity {
   
   private String contactType;
-  private String contact;
+  private String contactValue;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "personId", nullable = false)
+  @ManyToOne
+  @JoinColumn(name = "person_id")
   private Person person;
 
   /**
    * Constructor for Contact.
    *
    */
-  public Contact(String contactType, String contact) {
+  public Contact(String contactType, String contactValue) {
     this.contactType = contactType;
-    this.contact = contact;
+    this.contactValue = contactValue;
     // person can be set later or remain null
   }
 }

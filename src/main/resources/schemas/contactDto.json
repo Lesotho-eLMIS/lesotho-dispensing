@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Contact Data Transfer Object",
+  "description": "A DTO that represents contact information associated with a person.",
+  "properties": {
+    "contactType": {
+      "type": "string",
+      "description": "The type of contact information (e.g., phone, email, etc.)."
+    },
+    "contactValue": {
+      "type": "string",
+      "description": "The contact information (e.g., phone number or email address)."
+    },
+    "personId": {
+      "type": "string",
+      "description": "The unique identifier of the person this contact belongs to."
+    }
+  },
+  "required": ["contactType", "contactValue", "personId"]
+}

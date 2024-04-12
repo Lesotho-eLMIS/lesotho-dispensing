@@ -13,33 +13,14 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.dto.patient;
+package org.openlmis.dispensing.repository.patient;
 
+import java.util.List;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.patient.MedicalHistory;
+import org.openlmis.dispensing.domain.patient.Patient;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class MedicalHistoryDto {
-  private UUID id;
-  private String type;
-  private String history;
-
-  /**
-   * Convert dto to jpa model.
-   *
-   * @return the converted jpa model object.
-   */
-  public MedicalHistory toMedicalHistory() {
-    MedicalHistory medicalHistory = new MedicalHistory(
-        type, history
-    );
-    return medicalHistory;
-  }
+public interface PatientRepository extends PagingAndSortingRepository<Patient, UUID> {
+  List<Patient> findByPatientNumber(@Param("patientNumber") String patientNumber);
 }

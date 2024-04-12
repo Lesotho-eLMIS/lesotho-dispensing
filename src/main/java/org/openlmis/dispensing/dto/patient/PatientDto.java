@@ -15,9 +15,13 @@
 
 package org.openlmis.dispensing.dto.patient;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
+import static java.util.Collections.emptyList;
+
+import java.util.ArrayList;
+//import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+//import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,9 +34,10 @@ import org.openlmis.dispensing.domain.patient.Patient;
 @NoArgsConstructor
 @Builder
 public class PatientDto {
+  private UUID id;
   private String patientNumber;
   private PersonDto personDto;
-  private Set<MedicalHistoryDto> medicalHistory;
+  private List<MedicalHistoryDto> medicalHistory;
 
   /**
    * Convert dto to jpa model.
@@ -49,14 +54,15 @@ public class PatientDto {
   /**
    * Gets medical history as {@link MedicalHistory}.
    */
-  public Set<MedicalHistory> medicalHistory() {
+  public List<MedicalHistory> medicalHistory() {
     if (null == medicalHistory) {
-      return Collections.emptySet();
+      return emptyList();
     }
 
-    return 
-      medicalHistory.stream()
-                    .map(medicalHistoryDto -> medicalHistoryDto.toMedicalHistory())
-                    .collect(Collectors.toSet());
+    List<MedicalHistory> medicalHistoryList = new ArrayList<>();
+    for (MedicalHistoryDto medicalHistoryDto : medicalHistory) {
+      medicalHistoryList.add(medicalHistoryDto.toMedicalHistory());
+    }
+    return medicalHistoryList;
   }
 }
