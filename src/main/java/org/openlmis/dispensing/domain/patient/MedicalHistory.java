@@ -35,7 +35,7 @@ public class MedicalHistory extends BaseEntity {
   private String history;
 
   @ManyToOne
-  @JoinColumn(name = "patient_id", nullable = false)
+  @JoinColumn(name = "patient_id")
   private Patient patient;
 
   /**

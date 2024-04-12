@@ -35,7 +35,7 @@ public class Contact extends BaseEntity {
   private String contactValue;
 
   @ManyToOne
-  @JoinColumn(name = "person_id", nullable = false)
+  @JoinColumn(name = "person_id")
   private Person person;
 
   /**
