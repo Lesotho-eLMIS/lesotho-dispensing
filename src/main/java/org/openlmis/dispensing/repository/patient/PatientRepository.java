@@ -17,8 +17,8 @@ package org.openlmis.dispensing.repository.patient;
 
 import java.util.UUID;
 import org.openlmis.dispensing.domain.patient.Patient;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface PatientRepository extends JpaRepository<Patient, UUID> {
+public interface PatientRepository extends PagingAndSortingRepository<Patient, UUID> {
 
 }

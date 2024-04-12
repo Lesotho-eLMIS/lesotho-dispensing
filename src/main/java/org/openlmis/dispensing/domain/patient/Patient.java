@@ -15,7 +15,7 @@
 
 package org.openlmis.dispensing.domain.patient;
 
-import java.util.Set;
+import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -40,6 +40,7 @@ public class Patient extends BaseEntity {
   @JoinColumn(name = "personId", referencedColumnName = "id")
   private Person person;
 
-  @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<MedicalHistory> medicalHistory;
+  @OneToMany(cascade = CascadeType.ALL)
+  @JoinColumn(name = "patientId")
+  private List<MedicalHistory> medicalHistory;
 }

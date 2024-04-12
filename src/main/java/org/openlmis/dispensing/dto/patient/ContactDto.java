@@ -29,7 +29,7 @@ import org.openlmis.dispensing.domain.patient.Contact;
 public class ContactDto {
   private UUID id;
   private String contactType;
-  private String contacts;
+  private String contactValue;
 
   /**
    * Convert dto to jpa model.
@@ -38,7 +38,7 @@ public class ContactDto {
    */
   public Contact toContact() {
     Contact contact = new Contact(
-        contactType, contacts
+        contactType, contactValue
     );
     return contact;
   }

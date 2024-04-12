@@ -15,10 +15,11 @@
 
 package org.openlmis.dispensing.service.patient;
 
-import java.util.ArrayList;
-import java.util.Collections;
+//import java.util.ArrayList;
+//import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+//import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,8 +35,10 @@ import org.openlmis.dispensing.repository.patient.PatientRepository;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PatientService {
@@ -50,17 +53,18 @@ public class PatientService {
    * @return a list of pod events.
    */
   public List<PatientDto> getPatients() {
-    List<Patient> patients = patientRepository.findAll();
+    // List<Patient> patients = patientRepository.findAll();
     
-    if (patients == null) {
-      return Collections.emptyList();
-    }
+    // if (patients == null) {
+    //   return Collections.emptyList();
+    // }
 
-    List<PatientDto> patientDtos = new ArrayList<>();
-    for (Patient patient : patients) {
-      patientDtos.add(patientToDto(patient));
-    }
-    return patientDtos;
+    // List<PatientDto> patientDtos = new ArrayList<>();
+    // for (Patient patient : patients) {
+    //   patientDtos.add(patientToDto(patient));
+    // }
+    // return patientDtos;
+    return null;
   }
 
   /**
@@ -79,11 +83,75 @@ public class PatientService {
    * @param patientDto patientDto.
    * @return id of created patientDto.
    */
+  @Transactional
   public UUID createPatient(PatientDto patientDto) {
-    Patient patient = patientDto.toPatient();
-    return patientRepository.save(patient).getId();
+    // Patient patient = convertToPatientEntity(patientDto);
+    // patient.getId();
+    Patient patient2 = patientDto.toPatient();
+    return patientRepository.save(patient2).getId();
   }
 
+  // /**
+  //  * Convert patient dto to jpa model (entity).
+  //  *
+  //  * @param patientDto Dto.
+  //  * @return Patient.
+  //  */
+  // private Patient convertToPatientEntity(PatientDto patientDto) {
+  //   if (null == patientDto) {
+  //     return null;
+  //   }
+  //   Patient patient = new Patient();
+  //   patient.setPatientNumber(patientDto.getPatientNumber());
+  //   patient.setPerson(convertToPersonEntity(patientDto.getPersonDto()));
+  //   if (patientDto.getMedicalHistory() != null) {
+  //     patient.setMedicalHistory(patientDto.getMedicalHistory().stream()
+  //         .map(this::convertToMedicalHistoryEntity)
+  //         .collect(Collectors.toSet()));
+  //   }
+  //   return patient;
+  // }
+
+  // private Person convertToPersonEntity(PersonDto personDto) {
+  //   if (personDto == null) {
+  //     return null;
+  //   }
+  //   Person person = new Person();
+  //   person.setFirstName(personDto.getFirstName());
+  //   person.setLastName(personDto.getLastName());
+  //   person.setNationalId(personDto.getNationalId());
+  //   person.setDateOfBirth(personDto.getDateOfBirth());
+  //   person.setNickName(personDto.getNickName());
+  //   person.setSex(personDto.getSex());
+  //   person.setNextOfKinFullName(personDto.getNextOfKinFullName());
+  //   person.setNextOfKinContact(personDto.getNextOfKinContact());
+  //   person.setNickName(personDto.getNickName());
+  //   person.setMotherMaidenName(personDto.getMotherMaidenName());
+  //   person.setDeceased(personDto.getDeceased());
+  //   person.setRetired(personDto.getRetired());
+  //   if (personDto.getContacts() != null) {
+  //     person.setContacts(personDto.getContacts().stream()
+  //                           .map(this::convertToContactEntity)
+  //                           .collect(Collectors.toSet()));
+  //   }
+  //   return person;
+  // }
+
+  // private Contact convertToContactEntity(ContactDto contactDto) {
+  //   if (contactDto == null) {
+  //     return null;
+  //   }
+  //   return new Contact(contactDto.getContactType(),contactDto.getContacts());
+  // }
+
+  // private MedicalHistory convertToMedicalHistoryEntity(MedicalHistoryDto medicalHistoryDto) {
+  //   if (medicalHistoryDto == null || medicalHistoryDto.getType() == null
+  //         || medicalHistoryDto.getHistory() == null) {
+  //     return null;
+  //   }
+  //   return new MedicalHistory(medicalHistoryDto.getType(), medicalHistoryDto.getHistory());
+  // }
+  
   /**
    * Create dto from jpa model.
    *
@@ -98,7 +166,7 @@ public class PatientService {
       .medicalHistory(patient.getMedicalHistory() != null
           ? patient.getMedicalHistory().stream()
                                        .map(this::medicalHistoryToDto)
-                                       .collect(Collectors.toSet())
+                                       .collect(Collectors.toList())
           : null)
       .build();
   }
@@ -127,7 +195,7 @@ public class PatientService {
       .contacts(person.getContacts() != null 
           ? person.getContacts().stream()
                                 .map(this::contactToDto)
-                                .collect(Collectors.toSet())
+                                .collect(Collectors.toList())
           : null)
       .build();
   }
@@ -146,7 +214,7 @@ public class PatientService {
     return ContactDto.builder()
       .id(contact.getId())
       .contactType(contact.getContactType())
-      .contacts(contact.getContact())
+      .contactValue(contact.getContactValue())
       .build();
   }
 

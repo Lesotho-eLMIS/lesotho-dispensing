@@ -15,11 +15,14 @@
 
 package org.openlmis.dispensing.dto.patient;
 
+import static java.util.Collections.emptyList;
+
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Set;
+import java.util.ArrayList;
+//import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+//import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -46,7 +49,7 @@ public class PersonDto {
   private String motherMaidenName;
   private Boolean deceased;
   private Boolean retired;
-  private Set<ContactDto> contacts;
+  private List<ContactDto> contacts;
 
   /**
    * Convert dto to jpa model.
@@ -65,13 +68,15 @@ public class PersonDto {
   /**
    * Gets contacts as {@link Contact}.
    */
-  public Set<Contact> contacts() {
+  public List<Contact> contacts() {
     if (null == contacts) {
-      return Collections.emptySet();
+      return emptyList();
     }
 
-    return contacts.stream()
-                   .map(contactDto -> contactDto.toContact())
-                   .collect(Collectors.toSet());
+    List<Contact> contactsList = new ArrayList<>();
+    for (ContactDto contactDto : contacts) {
+      contactsList.add(contactDto.toContact());
+    }
+    return contactsList;
   }
 }
