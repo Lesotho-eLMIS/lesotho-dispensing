@@ -37,10 +37,9 @@ public class Patient extends BaseEntity {
   private String patientNumber;
 
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "personId", referencedColumnName = "id")
+  @JoinColumn(name = "person_id", referencedColumnName = "id")
   private Person person;
 
-  @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "patientId")
+  @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<MedicalHistory> medicalHistory;
 }

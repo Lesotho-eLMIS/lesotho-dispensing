@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -46,8 +45,8 @@ public class Person extends BaseEntity {
   private String motherMaidenName;
   private Boolean deceased;
   private Boolean retired;
-  @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "personId") // foreign key in Contact table
+
+  @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Contact> contacts;
   //dates for events needed?? e.g. deceased, retired, created, etc.
 }
