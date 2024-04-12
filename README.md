@@ -1,5 +1,5 @@
-# OpenLMIS Stock Management Service
-This service allows users to create/update stock cards and stock movements.
+# eLMIS Dispensing Service
+This service allows users to dispense commodities to patients.
 
 ## Prerequisites
 * Java 1.8+
