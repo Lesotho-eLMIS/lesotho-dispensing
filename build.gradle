@@ -68,7 +68,7 @@ dependencies {
     compile "org.slf4j:slf4j-ext"
     compile "com.github.tomakehurst:wiremock:1.58"
 
-    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
     compile group: 'javax.interceptor', name: 'javax.interceptor-api', version: '1.2'
 
     testCompile "junit:junit"
