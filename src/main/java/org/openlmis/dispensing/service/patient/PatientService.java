@@ -32,11 +32,13 @@ import org.openlmis.dispensing.dto.patient.MedicalHistoryDto;
 import org.openlmis.dispensing.dto.patient.PatientDto;
 import org.openlmis.dispensing.dto.patient.PersonDto;
 import org.openlmis.dispensing.repository.patient.PatientRepository;
+import org.openlmis.dispensing.util.PatientSpecifications;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +67,23 @@ public class PatientService {
     // }
     // return patientDtos;
     return null;
+  }
+
+  /**
+   * Search for patients.
+   *
+   * @param patientNumber unique patient number.
+   * @param firstName patient first name.
+   * @param lastName patient last name.
+   * @param dateOfBirth patient date of birth.
+   * @return List of patients matching the criteria.
+   */
+  @Transactional(readOnly = true)
+  public List<PatientDto> searchPatients(String patientNumber, String firstName, String lastName, String dateOfBirth) {
+    Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName, dateOfBirth);
+    return patientRepository.findAll(spec).stream()
+                                          .map(this::patientToDto)
+                                          .collect(Collectors.toList());
   }
 
   /**
