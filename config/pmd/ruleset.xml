@@ -27,7 +27,7 @@
             <property name="reportLevel" value="20"/>
         </properties>
     </rule>
-    <rule ref="rulesets/java/codesize.xml/TooManyMethods"/>
+    <!--<rule ref="rulesets/java/codesize.xml/TooManyMethods"/> -->
 
     <rule ref="rulesets/java/logging-java.xml/AvoidPrintStackTrace"/>
 

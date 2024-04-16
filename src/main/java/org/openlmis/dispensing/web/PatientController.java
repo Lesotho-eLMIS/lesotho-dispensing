@@ -37,13 +37,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 // import org.springframework.web.bind.annotation.DeleteMapping;
-// import org.springframework.web.bind.annotation.PathVariable;
-// import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-// import org.springframework.web.bind.annotation.ResponseBody;
-// import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Controller used to perform CRUD operations on point of delivery event.
@@ -51,7 +51,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping("/api/patient")
 public class PatientController extends BaseController {
-  //public static final String ID_PATH_VARIABLE = "/{id}";
+  public static final String ID_PATH_VARIABLE = "/{id}";
   private static final Logger LOGGER = LoggerFactory.getLogger(PatientController.class);
 
   //   @Autowired
@@ -103,5 +103,22 @@ public class PatientController extends BaseController {
       @RequestParam(required = false) String dateOfBirth) {
     List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dateOfBirth);
     return new ResponseEntity<>(patientDtos, OK);
+  }
+
+  /**
+   * Update a Patient.
+   *
+   * @param id Patient id.
+   * @param dto Patient dto.
+   * @return Updates Patient dto.
+   */
+  @Transactional
+  @PutMapping(ID_PATH_VARIABLE)
+  @ResponseStatus(OK)
+  @ResponseBody
+  public ResponseEntity<PatientDto> updatePatient(@PathVariable UUID id,
+                                                    @RequestBody PatientDto dto) {
+    PatientDto updatedPatient = patientService.updatePatient(id, dto);
+    return new ResponseEntity<>(updatedPatient, OK);
   }
 }

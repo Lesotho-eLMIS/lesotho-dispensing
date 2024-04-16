@@ -15,7 +15,7 @@
 
 package org.openlmis.dispensing.service.patient;
 
-// import java.util.ArrayList;
+//import java.util.ArrayList;
 // import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -50,26 +50,6 @@ public class PatientService {
   private PatientRepository patientRepository;
 
   /**
-   * Get a list of Patients.
-   *
-   * @return a list of pod events.
-   */
-  public List<PatientDto> getPatients() {
-    // List<Patient> patients = patientRepository.findAll();
-    
-    // if (patients == null) {
-    //   return Collections.emptyList();
-    // }
-
-    // List<PatientDto> patientDtos = new ArrayList<>();
-    // for (Patient patient : patients) {
-    //   patientDtos.add(patientToDto(patient));
-    // }
-    // return patientDtos;
-    return null;
-  }
-
-  /**
    * Search for patients.
    *
    * @param patientNumber unique patient number.
@@ -87,13 +67,24 @@ public class PatientService {
   }
 
   /**
-   * Get a Patient by id.
+   * Update a Patient.
    *
-   * @param id patient.
-   * @return a patient.
+   * @param id patient id.
+   * @param dto patient dto.
+   * @return a updated patient dto.
    */
-  public Optional<Patient> getPatientById(UUID id) {
-    return patientRepository.findById(id);
+  public PatientDto updatePatient(UUID id, PatientDto dto) {
+    Optional<Patient> existingPatient = patientRepository.findById(id);
+
+    if (!existingPatient.isPresent()) {
+      return null;
+    }
+
+    Patient patient = existingPatient.get();
+    updatePatientEntity(patient, dto);
+    patient = patientRepository.save(patient);
+
+    return patientToDto(patient);
   }
 
   /**
@@ -252,4 +243,72 @@ public class PatientService {
       .history(medicalHistory.getHistory())
       .build();
   }
+
+  private void updatePatientEntity(Patient patient, PatientDto patientDto) {
+    if (patientDto.getPatientNumber() != null) {
+      patient.setPatientNumber(patientDto.getPatientNumber());
+    }
+    if (patientDto.getPersonDto() != null) {
+      updatePersonEntity(patient.getPerson(), patientDto.getPersonDto());
+    }
+    if (patientDto.getMedicalHistory() != null) {
+      patient.getMedicalHistory().clear();
+      patient.getMedicalHistory().addAll(patientDto.getMedicalHistory().stream()
+          .map(medicalHistoryDto -> convertToMedicalHistoryEntity(medicalHistoryDto, patient))
+          .collect(Collectors.toList()));
+    }
+  }
+
+  private void updatePersonEntity(Person person, PersonDto personDto) {
+    if (personDto == null || person == null) {
+      return;
+    }
+
+    if (personDto.getFirstName() != null) {
+      person.setFirstName(personDto.getFirstName());
+    }
+    if (personDto.getLastName() != null) {
+      person.setLastName(personDto.getLastName());
+    }
+    if (personDto.getNickName() != null) {
+      person.setNickName(personDto.getNickName());
+    }
+    if (personDto.getNationalId() != null) {
+      person.setNationalId(personDto.getNationalId());
+    }
+    if (personDto.getSex() != null) {
+      person.setSex(personDto.getSex());
+    }
+    if (personDto.getDateOfBirth() != null) {
+      person.setDateOfBirth(personDto.getDateOfBirth());
+    }
+    if (personDto.getIsDoBEstimated() != null) {
+      person.setIsDoBEstimated(personDto.getIsDoBEstimated());
+    }
+    if (personDto.getPhysicalAddress() != null) {
+      person.setPhysicalAddress(personDto.getPhysicalAddress());
+    }
+    if (personDto.getNextOfKinFullName() != null) {
+      person.setNextOfKinFullName(personDto.getNextOfKinFullName());
+    }
+    if (personDto.getNextOfKinContact() != null) {
+      person.setNextOfKinContact(personDto.getNextOfKinContact());
+    }
+    if (personDto.getMotherMaidenName() != null) {
+      person.setMotherMaidenName(personDto.getMotherMaidenName());
+    }
+    if (personDto.getDeceased() != null) {
+      person.setDeceased(personDto.getDeceased());
+    }
+    if (personDto.getRetired() != null) {
+      person.setRetired(personDto.getRetired());
+    }
+    
+    if (personDto.getContacts() != null) { //update contacts
+      person.getContacts().clear();
+      person.getContacts().addAll(personDto.getContacts().stream()
+          .map(contactDto -> convertToContactEntity(contactDto, person))
+          .collect(Collectors.toList()));
+    }
+  } 
 }
