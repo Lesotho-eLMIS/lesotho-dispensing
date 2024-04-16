@@ -15,7 +15,7 @@
 
 package org.openlmis.dispensing.service.patient;
 
-// import java.util.ArrayList;
+//import java.util.ArrayList;
 // import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +32,13 @@ import org.openlmis.dispensing.dto.patient.MedicalHistoryDto;
 import org.openlmis.dispensing.dto.patient.PatientDto;
 import org.openlmis.dispensing.dto.patient.PersonDto;
 import org.openlmis.dispensing.repository.patient.PatientRepository;
+import org.openlmis.dispensing.util.PatientSpecifications;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,33 +50,41 @@ public class PatientService {
   private PatientRepository patientRepository;
 
   /**
-   * Get a list of Patients.
+   * Search for patients.
    *
-   * @return a list of pod events.
+   * @param patientNumber unique patient number.
+   * @param firstName patient first name.
+   * @param lastName patient last name.
+   * @param dateOfBirth patient date of birth.
+   * @return List of patients matching the criteria.
    */
-  public List<PatientDto> getPatients() {
-    // List<Patient> patients = patientRepository.findAll();
-    
-    // if (patients == null) {
-    //   return Collections.emptyList();
-    // }
-
-    // List<PatientDto> patientDtos = new ArrayList<>();
-    // for (Patient patient : patients) {
-    //   patientDtos.add(patientToDto(patient));
-    // }
-    // return patientDtos;
-    return null;
+  @Transactional(readOnly = true)
+  public List<PatientDto> searchPatients(String patientNumber, String firstName, String lastName, String dateOfBirth) {
+    Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName, dateOfBirth);
+    return patientRepository.findAll(spec).stream()
+                                          .map(this::patientToDto)
+                                          .collect(Collectors.toList());
   }
 
   /**
-   * Get a Patient by id.
+   * Update a Patient.
    *
-   * @param id patient.
-   * @return a patient.
+   * @param id patient id.
+   * @param dto patient dto.
+   * @return a updated patient dto.
    */
-  public Optional<Patient> getPatientById(UUID id) {
-    return patientRepository.findById(id);
+  public PatientDto updatePatient(UUID id, PatientDto dto) {
+    Optional<Patient> existingPatient = patientRepository.findById(id);
+
+    if (!existingPatient.isPresent()) {
+      return null;
+    }
+
+    Patient patient = existingPatient.get();
+    updatePatientEntity(patient, dto);
+    patient = patientRepository.save(patient);
+
+    return patientToDto(patient);
   }
 
   /**
@@ -233,4 +243,72 @@ public class PatientService {
       .history(medicalHistory.getHistory())
       .build();
   }
+
+  private void updatePatientEntity(Patient patient, PatientDto patientDto) {
+    if (patientDto.getPatientNumber() != null) {
+      patient.setPatientNumber(patientDto.getPatientNumber());
+    }
+    if (patientDto.getPersonDto() != null) {
+      updatePersonEntity(patient.getPerson(), patientDto.getPersonDto());
+    }
+    if (patientDto.getMedicalHistory() != null) {
+      patient.getMedicalHistory().clear();
+      patient.getMedicalHistory().addAll(patientDto.getMedicalHistory().stream()
+          .map(medicalHistoryDto -> convertToMedicalHistoryEntity(medicalHistoryDto, patient))
+          .collect(Collectors.toList()));
+    }
+  }
+
+  private void updatePersonEntity(Person person, PersonDto personDto) {
+    if (personDto == null || person == null) {
+      return;
+    }
+
+    if (personDto.getFirstName() != null) {
+      person.setFirstName(personDto.getFirstName());
+    }
+    if (personDto.getLastName() != null) {
+      person.setLastName(personDto.getLastName());
+    }
+    if (personDto.getNickName() != null) {
+      person.setNickName(personDto.getNickName());
+    }
+    if (personDto.getNationalId() != null) {
+      person.setNationalId(personDto.getNationalId());
+    }
+    if (personDto.getSex() != null) {
+      person.setSex(personDto.getSex());
+    }
+    if (personDto.getDateOfBirth() != null) {
+      person.setDateOfBirth(personDto.getDateOfBirth());
+    }
+    if (personDto.getIsDoBEstimated() != null) {
+      person.setIsDoBEstimated(personDto.getIsDoBEstimated());
+    }
+    if (personDto.getPhysicalAddress() != null) {
+      person.setPhysicalAddress(personDto.getPhysicalAddress());
+    }
+    if (personDto.getNextOfKinFullName() != null) {
+      person.setNextOfKinFullName(personDto.getNextOfKinFullName());
+    }
+    if (personDto.getNextOfKinContact() != null) {
+      person.setNextOfKinContact(personDto.getNextOfKinContact());
+    }
+    if (personDto.getMotherMaidenName() != null) {
+      person.setMotherMaidenName(personDto.getMotherMaidenName());
+    }
+    if (personDto.getDeceased() != null) {
+      person.setDeceased(personDto.getDeceased());
+    }
+    if (personDto.getRetired() != null) {
+      person.setRetired(personDto.getRetired());
+    }
+    
+    if (personDto.getContacts() != null) { //update contacts
+      person.getContacts().clear();
+      person.getContacts().addAll(personDto.getContacts().stream()
+          .map(contactDto -> convertToContactEntity(contactDto, person))
+          .collect(Collectors.toList()));
+    }
+  } 
 }
