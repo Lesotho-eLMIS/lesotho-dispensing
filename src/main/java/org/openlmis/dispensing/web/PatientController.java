@@ -26,7 +26,6 @@ import java.util.UUID;
 import org.openlmis.dispensing.dto.patient.PatientDto;
 // import org.openlmis.dispensing.service.PermissionService;
 import org.openlmis.dispensing.service.patient.PatientService;
-import org.openlmis.dispensing.web.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
@@ -100,8 +99,19 @@ public class PatientController extends BaseController {
       @RequestParam(required = false) String patientNumber,
       @RequestParam(required = false) String firstName,
       @RequestParam(required = false) String lastName,
-      @RequestParam(required = false) String dateOfBirth) {
-    List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dateOfBirth);
+      @RequestParam(required = false) String dateOfBirth,
+      @RequestParam(required = false) String facilityId,
+      @RequestParam(required = false) String nationalId) {
+    UUID facilityUuid = null;
+    if (facilityId != null && !facilityId.isEmpty()) {
+      try {
+        facilityUuid = UUID.fromString(facilityId);  // Convert String to UUID
+      } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(null);
+      }
+    }
+
+    List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dateOfBirth, facilityUuid, nationalId);
     return new ResponseEntity<>(patientDtos, OK);
   }
 

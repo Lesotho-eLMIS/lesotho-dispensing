@@ -66,8 +66,8 @@ public class PatientService {
    * @return List of patients matching the criteria.
    */
   @Transactional(readOnly = true)
-  public List<PatientDto> searchPatients(String patientNumber, String firstName, String lastName, String dateOfBirth) {
-    Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName, dateOfBirth);
+  public List<PatientDto> searchPatients(String patientNumber, String firstName, String lastName, String dateOfBirth, UUID facilityId, String nationalId) {
+    Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName, dateOfBirth, facilityId, nationalId);
     return patientRepository.findAll(spec).stream()
                                           .map(this::patientToDto)
                                           .collect(Collectors.toList());
@@ -145,13 +145,14 @@ public class PatientService {
     Person person = new Person();
     person.setFirstName(personDto.getFirstName());
     person.setLastName(personDto.getLastName());
+    person.setNickName(personDto.getNickName());
     person.setNationalId(personDto.getNationalId());
     person.setDateOfBirth(personDto.getDateOfBirth());
-    person.setNickName(personDto.getNickName());
+    person.setIsDobEstimated(personDto.getIsDobEstimated());
     person.setSex(personDto.getSex());
+    person.setPhysicalAddress(personDto.getPhysicalAddress());
     person.setNextOfKinFullName(personDto.getNextOfKinFullName());
     person.setNextOfKinContact(personDto.getNextOfKinContact());
-    person.setNickName(personDto.getNickName());
     person.setMotherMaidenName(personDto.getMotherMaidenName());
     person.setDeceased(personDto.getDeceased());
     person.setRetired(personDto.getRetired());
@@ -211,9 +212,10 @@ public class PatientService {
       .nationalId(person.getNationalId())
       .firstName(person.getFirstName())
       .lastName(person.getLastName())
+      .nickName(person.getNickName())
       .dateOfBirth(person.getDateOfBirth())
       .sex(person.getSex())
-      .isDoBEstimated(person.getIsDoBEstimated())
+      .isDobEstimated(person.getIsDobEstimated())
       .physicalAddress(person.getPhysicalAddress())
       .nextOfKinFullName(person.getNextOfKinFullName())
       .nextOfKinContact(person.getNextOfKinContact())
@@ -265,9 +267,7 @@ public class PatientService {
   }
 
   private void updatePatientEntity(Patient patient, PatientDto patientDto) {
-    if (patientDto.getPatientNumber() != null) {
-      patient.setPatientNumber(patientDto.getPatientNumber());
-    }
+
     if (patientDto.getPersonDto() != null) {
       updatePersonEntity(patient.getPerson(), patientDto.getPersonDto());
     }
@@ -302,8 +302,8 @@ public class PatientService {
     if (personDto.getDateOfBirth() != null) {
       person.setDateOfBirth(personDto.getDateOfBirth());
     }
-    if (personDto.getIsDoBEstimated() != null) {
-      person.setIsDoBEstimated(personDto.getIsDoBEstimated());
+    if (personDto.getIsDobEstimated() != null) {
+      person.setIsDobEstimated(personDto.getIsDobEstimated());
     }
     if (personDto.getPhysicalAddress() != null) {
       person.setPhysicalAddress(personDto.getPhysicalAddress());

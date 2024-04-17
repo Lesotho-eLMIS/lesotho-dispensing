@@ -17,6 +17,8 @@ package org.openlmis.dispensing.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import javax.persistence.criteria.Predicate;
 import org.openlmis.dispensing.domain.patient.Patient;
 import org.springframework.data.jpa.domain.Specification;
@@ -56,6 +58,24 @@ public class PatientSpecifications {
   /**
    * Specification.
    *
+   * @return specification.
+   */
+  public static Specification<Patient> hasFacilityCode(UUID facilityId) {
+    return (root, query, cb) -> cb.equal(root.get("facilityId"), facilityId);
+  }
+
+  /**
+   * Specification.
+   *
+   * @return specification.
+   */
+  public static Specification<Patient> hasNationalId(String nationalId) {
+    return (root, query, cb) -> cb.equal(root.get(PERSON_FIELD).get("nationalId"), nationalId);
+  }
+
+  /**
+   * Specification.
+   *
    * @return Specification.
    */
   public static Specification<Patient> hasDateOfBirth(String dateOfBirth) {
@@ -67,7 +87,7 @@ public class PatientSpecifications {
    *
    * @return Specification.
    */
-  public static Specification<Patient> bySearchCriteria(String patientNumber, String firstName, String lastName, String dateOfBirth) {
+  public static Specification<Patient> bySearchCriteria(String patientNumber, String firstName, String lastName, String dateOfBirth, UUID facilityId, String nationalId) {
     return (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
       if (patientNumber != null) {
@@ -81,6 +101,12 @@ public class PatientSpecifications {
       }
       if (dateOfBirth != null) {
         predicates.add(cb.equal(root.get(PERSON_FIELD).get("dateOfBirth"), dateOfBirth));
+      }
+      if (facilityId != null) {
+        predicates.add(cb.equal(root.get("facilityId"), facilityId));
+      }
+      if (nationalId != null) {
+        predicates.add(cb.equal(root.get(PERSON_FIELD).get("nationalId"), nationalId));
       }
       return cb.and(predicates.toArray(new Predicate[0]));
     };
