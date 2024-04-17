@@ -15,8 +15,12 @@
 
 package org.openlmis.dispensing.domain.patient;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
+
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -34,7 +38,14 @@ import org.openlmis.dispensing.domain.BaseEntity;
 @Table(name = "patient", schema = "dispensing")
 public class Patient extends BaseEntity {
 
+  @Column(nullable = false, unique = true)
   private String patientNumber;
+
+  @Column(nullable = false)
+  private UUID facilityId;
+
+  @Column(nullable = false)
+  private LocalDate registrationDate;
 
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "person_id", referencedColumnName = "id")

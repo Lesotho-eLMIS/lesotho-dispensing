@@ -15,7 +15,7 @@
 
 package org.openlmis.dispensing.repository.patient;
 
-import java.util.List;
+import java.time.LocalDate;
 import java.util.UUID;
 import org.openlmis.dispensing.domain.patient.Patient;
 // import org.springframework.data.repository.PagingAndSortingRepository;
@@ -25,5 +25,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface PatientRepository extends JpaRepository<Patient, UUID>,
     JpaSpecificationExecutor<Patient> {
-  List<Patient> findByPatientNumber(@Param("patientNumber") String patientNumber);
+      
+  Patient findByPatientNumber(@Param("patientNumber") String patientNumber);
+
+  int countByFacilityIdAndRegistrationDate(UUID facilityId, LocalDate date);
+
+  int countByFacilityId(UUID facilityId);
 }

@@ -15,6 +15,8 @@
 
 package org.openlmis.dispensing.service.patient;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 //import java.util.ArrayList;
 // import java.util.Collections;
 import java.util.List;
@@ -32,6 +34,7 @@ import org.openlmis.dispensing.dto.patient.MedicalHistoryDto;
 import org.openlmis.dispensing.dto.patient.PatientDto;
 import org.openlmis.dispensing.dto.patient.PersonDto;
 import org.openlmis.dispensing.repository.patient.PatientRepository;
+import org.openlmis.dispensing.service.referencedata.FacilityReferenceDataService;
 import org.openlmis.dispensing.util.PatientSpecifications;
 
 //import org.slf4j.Logger;
@@ -45,9 +48,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PatientService {
   //private static final Logger LOGGER = LoggerFactory.getLogger(PatientService.class);
+  private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
   @Autowired
   private PatientRepository patientRepository;
+
+  @Autowired
+  private FacilityReferenceDataService facilityReferenceDataService;
 
   /**
    * Search for patients.
@@ -109,15 +116,26 @@ public class PatientService {
     if (null == patientDto) {
       return null;
     }
-    Patient patient = new Patient();
-    patient.setPatientNumber(patientDto.getPatientNumber());
-    patient.setPerson(convertToPersonEntity(patientDto.getPersonDto()));
-    if (patientDto.getMedicalHistory() != null) {
-      patient.setMedicalHistory(patientDto.getMedicalHistory().stream()
-          .map(medicalHistoryDto -> convertToMedicalHistoryEntity(medicalHistoryDto, patient))
-          .collect(Collectors.toList()));
+    
+    //given facility SHOULD exist
+    if (facilityReferenceDataService.exists(patientDto.getFacilityId())) {
+      Patient patient = new Patient();
+      LocalDate today = LocalDate.now();
+
+      String facilityCode = facilityReferenceDataService.findOne(patientDto.getFacilityId()).getCode();
+
+      patient.setPatientNumber(generatePatientNumber(patientDto.getFacilityId(), facilityCode, today));
+      patient.setPerson(convertToPersonEntity(patientDto.getPersonDto()));
+      patient.setFacilityId(patientDto.getFacilityId());
+      patient.setRegistrationDate(today);
+      if (patientDto.getMedicalHistory() != null) {
+        patient.setMedicalHistory(patientDto.getMedicalHistory().stream()
+            .map(medicalHistoryDto -> convertToMedicalHistoryEntity(medicalHistoryDto, patient))
+            .collect(Collectors.toList()));
+      }
+      return patient;
     }
-    return patient;
+    return null;
   }
 
   private Person convertToPersonEntity(PersonDto personDto) {
@@ -170,6 +188,8 @@ public class PatientService {
     return PatientDto.builder()
       .id(patient.getId())
       .patientNumber(patient.getPatientNumber())
+      .facilityId(patient.getFacilityId())
+      .registrationDate(patient.getRegistrationDate())
       .personDto(personToDto(patient.getPerson()))
       .medicalHistory(patient.getMedicalHistory() != null
           ? patient.getMedicalHistory().stream()
@@ -311,4 +331,11 @@ public class PatientService {
           .collect(Collectors.toList()));
     }
   } 
+
+  private synchronized String generatePatientNumber(UUID facilityId, String facilityCode, LocalDate date) {
+    String datePart = date.format(DATE_FORMAT);
+    //int countToday = patientRepository.countByFacilityIdAndRegistrationDate(facilityId, date);
+    int countSoFar = patientRepository.countByFacilityId(facilityId);
+    return facilityCode + "/" + datePart + "/" + String.format("%05d", countSoFar + 1);
+  }
 }
