@@ -42,7 +42,7 @@ public class PersonDto {
   private String nationalId;
   private String sex;
   private LocalDate dateOfBirth;
-  private Boolean isDoBEstimated;
+  private Boolean isDobEstimated;
   private String physicalAddress;
   private String nextOfKinFullName;
   private String nextOfKinContact;
@@ -59,7 +59,7 @@ public class PersonDto {
   public Person toPerson() {
     Person person = new Person(
         firstName, lastName, nickName, nationalId, sex, dateOfBirth,
-        isDoBEstimated, physicalAddress, nextOfKinFullName, nextOfKinContact,
+        isDobEstimated, physicalAddress, nextOfKinFullName, nextOfKinContact,
         motherMaidenName, deceased, retired, contacts()
     );
     return person;

@@ -38,7 +38,7 @@ public class Person extends BaseEntity {
   private String nationalId;
   private String sex;
   private LocalDate dateOfBirth;
-  private Boolean isDoBEstimated;
+  private Boolean isDobEstimated;
   private String physicalAddress;
   private String nextOfKinFullName;
   private String nextOfKinContact;
