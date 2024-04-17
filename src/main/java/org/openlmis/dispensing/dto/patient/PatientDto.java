@@ -15,19 +15,18 @@
 
 package org.openlmis.dispensing.dto.patient;
 
-import static java.util.Collections.emptyList;
-
-import java.util.ArrayList;
-//import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-//import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.patient.MedicalHistory;
 import org.openlmis.dispensing.domain.patient.Patient;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static java.util.Collections.emptyList;
 
 @Data
 @AllArgsConstructor
@@ -45,10 +44,9 @@ public class PatientDto {
    * @return the converted jpa model object.
    */
   public Patient toPatient() {
-    Patient patient = new Patient(
+    return new Patient(
         patientNumber, personDto.toPerson(), medicalHistory()
     );
-    return patient;
   }
 
   /**

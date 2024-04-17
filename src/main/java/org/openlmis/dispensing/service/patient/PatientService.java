@@ -15,14 +15,6 @@
 
 package org.openlmis.dispensing.service.patient;
 
-//import java.util.ArrayList;
-// import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-// import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import org.openlmis.dispensing.domain.patient.Contact;
 import org.openlmis.dispensing.domain.patient.MedicalHistory;
 import org.openlmis.dispensing.domain.patient.Patient;
@@ -33,18 +25,18 @@ import org.openlmis.dispensing.dto.patient.PatientDto;
 import org.openlmis.dispensing.dto.patient.PersonDto;
 import org.openlmis.dispensing.repository.patient.PatientRepository;
 import org.openlmis.dispensing.util.PatientSpecifications;
-
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 @Service
 public class PatientService {
-  //private static final Logger LOGGER = LoggerFactory.getLogger(PatientService.class);
 
   @Autowired
   private PatientRepository patientRepository;
@@ -53,23 +45,23 @@ public class PatientService {
    * Search for patients.
    *
    * @param patientNumber unique patient number.
-   * @param firstName patient first name.
-   * @param lastName patient last name.
-   * @param dateOfBirth patient date of birth.
+   * @param firstName     patient first name.
+   * @param lastName      patient last name.
+   * @param dateOfBirth   patient date of birth.
    * @return List of patients matching the criteria.
    */
   @Transactional(readOnly = true)
   public List<PatientDto> searchPatients(String patientNumber, String firstName, String lastName, String dateOfBirth) {
     Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName, dateOfBirth);
     return patientRepository.findAll(spec).stream()
-                                          .map(this::patientToDto)
-                                          .collect(Collectors.toList());
+        .map(this::patientToDto)
+        .collect(Collectors.toList());
   }
 
   /**
    * Update a Patient.
    *
-   * @param id patient id.
+   * @param id  patient id.
    * @param dto patient dto.
    * @return a updated patient dto.
    */
@@ -139,8 +131,8 @@ public class PatientService {
     person.setRetired(personDto.getRetired());
     if (personDto.getContacts() != null) {
       person.setContacts(personDto.getContacts().stream()
-                            .map(contactDto -> convertToContactEntity(contactDto, person))
-                            .collect(Collectors.toList()));
+          .map(contactDto -> convertToContactEntity(contactDto, person))
+          .collect(Collectors.toList()));
     }
     return person;
   }
@@ -149,17 +141,17 @@ public class PatientService {
     if (contactDto == null) {
       return null;
     }
-    return new Contact(contactDto.getContactType(),contactDto.getContactValue(), person);
+    return new Contact(contactDto.getContactType(), contactDto.getContactValue(), person);
   }
 
   private MedicalHistory convertToMedicalHistoryEntity(MedicalHistoryDto medicalHistoryDto, Patient patient) {
     if (medicalHistoryDto == null || medicalHistoryDto.getType() == null
-          || medicalHistoryDto.getHistory() == null) {
+        || medicalHistoryDto.getHistory() == null) {
       return null;
     }
     return new MedicalHistory(medicalHistoryDto.getType(), medicalHistoryDto.getHistory(), patient);
   }
-  
+
   /**
    * Create dto from jpa model.
    *
@@ -168,15 +160,15 @@ public class PatientService {
    */
   private PatientDto patientToDto(Patient patient) {
     return PatientDto.builder()
-      .id(patient.getId())
-      .patientNumber(patient.getPatientNumber())
-      .personDto(personToDto(patient.getPerson()))
-      .medicalHistory(patient.getMedicalHistory() != null
-          ? patient.getMedicalHistory().stream()
-                                       .map(this::medicalHistoryToDto)
-                                       .collect(Collectors.toList())
-          : null)
-      .build();
+        .id(patient.getId())
+        .patientNumber(patient.getPatientNumber())
+        .personDto(personToDto(patient.getPerson()))
+        .medicalHistory(patient.getMedicalHistory() != null
+            ? patient.getMedicalHistory().stream()
+            .map(this::medicalHistoryToDto)
+            .collect(Collectors.toList())
+            : null)
+        .build();
   }
 
   /**
@@ -187,25 +179,25 @@ public class PatientService {
    */
   private PersonDto personToDto(Person person) {
     return PersonDto.builder()
-      .id(person.getId())
-      .nationalId(person.getNationalId())
-      .firstName(person.getFirstName())
-      .lastName(person.getLastName())
-      .dateOfBirth(person.getDateOfBirth())
-      .sex(person.getSex())
-      .isDoBEstimated(person.getIsDoBEstimated())
-      .physicalAddress(person.getPhysicalAddress())
-      .nextOfKinFullName(person.getNextOfKinFullName())
-      .nextOfKinContact(person.getNextOfKinContact())
-      .motherMaidenName(person.getMotherMaidenName())
-      .deceased(person.getDeceased())
-      .retired(person.getRetired())
-      .contacts(person.getContacts() != null 
-          ? person.getContacts().stream()
-                                .map(this::contactToDto)
-                                .collect(Collectors.toList())
-          : null)
-      .build();
+        .id(person.getId())
+        .nationalId(person.getNationalId())
+        .firstName(person.getFirstName())
+        .lastName(person.getLastName())
+        .dateOfBirth(person.getDateOfBirth())
+        .sex(person.getSex())
+        .isDoBEstimated(person.getIsDoBEstimated())
+        .physicalAddress(person.getPhysicalAddress())
+        .nextOfKinFullName(person.getNextOfKinFullName())
+        .nextOfKinContact(person.getNextOfKinContact())
+        .motherMaidenName(person.getMotherMaidenName())
+        .deceased(person.getDeceased())
+        .retired(person.getRetired())
+        .contacts(person.getContacts() != null
+            ? person.getContacts().stream()
+            .map(this::contactToDto)
+            .collect(Collectors.toList())
+            : null)
+        .build();
   }
 
   /**
@@ -220,10 +212,10 @@ public class PatientService {
     }
 
     return ContactDto.builder()
-      .id(contact.getId())
-      .contactType(contact.getContactType())
-      .contactValue(contact.getContactValue())
-      .build();
+        .id(contact.getId())
+        .contactType(contact.getContactType())
+        .contactValue(contact.getContactValue())
+        .build();
   }
 
   /**
@@ -238,10 +230,10 @@ public class PatientService {
     }
 
     return MedicalHistoryDto.builder()
-      .id(medicalHistory.getId())
-      .type(medicalHistory.getType())
-      .history(medicalHistory.getHistory())
-      .build();
+        .id(medicalHistory.getId())
+        .type(medicalHistory.getType())
+        .history(medicalHistory.getHistory())
+        .build();
   }
 
   private void updatePatientEntity(Patient patient, PatientDto patientDto) {
@@ -303,12 +295,12 @@ public class PatientService {
     if (personDto.getRetired() != null) {
       person.setRetired(personDto.getRetired());
     }
-    
+
     if (personDto.getContacts() != null) { //update contacts
       person.getContacts().clear();
       person.getContacts().addAll(personDto.getContacts().stream()
           .map(contactDto -> convertToContactEntity(contactDto, person))
           .collect(Collectors.toList()));
     }
-  } 
+  }
 }

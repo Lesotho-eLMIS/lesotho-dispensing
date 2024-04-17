@@ -15,12 +15,13 @@
 
 package org.openlmis.dispensing.dto.patient;
 
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.patient.MedicalHistory;
+
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -37,9 +38,8 @@ public class MedicalHistoryDto {
    * @return the converted jpa model object.
    */
   public MedicalHistory toMedicalHistory() {
-    MedicalHistory medicalHistory = new MedicalHistory(
+    return new MedicalHistory(
         type, history
     );
-    return medicalHistory;
   }
 }

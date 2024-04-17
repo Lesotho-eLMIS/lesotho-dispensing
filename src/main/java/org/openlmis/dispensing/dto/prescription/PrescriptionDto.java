@@ -1,5 +1,9 @@
 package org.openlmis.dispensing.dto.prescription;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.patient.Contact;
 import org.openlmis.dispensing.domain.prescription.Prescription;
 import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
@@ -10,6 +14,10 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class PrescriptionDto {
   private String patientType;
   private LocalDate followUpDate;
@@ -29,11 +37,10 @@ public class PrescriptionDto {
    * @return the converted jpa model object.
    */
   public Prescription toPrescription() {
-    Prescription Prescription = new Prescription(
+    return new Prescription(
         patientType, followUpDate, issueDate, createdDate, capturedDate, lastUpdate,
         isVoided, status, facilityId, userId, lineItems()
     );
-    return Prescription;
   }
 
   /**

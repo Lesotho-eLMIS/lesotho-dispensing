@@ -15,12 +15,13 @@
 
 package org.openlmis.dispensing.dto.patient;
 
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.patient.Contact;
+
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -37,9 +38,8 @@ public class ContactDto {
    * @return the converted jpa model object.
    */
   public Contact toContact() {
-    Contact contact = new Contact(
+    return new Contact(
         contactType, contactValue
     );
-    return contact;
   }
 }
