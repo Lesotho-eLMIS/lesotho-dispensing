@@ -15,9 +15,7 @@
 
 package org.openlmis.dispensing.dto.patient;
 
-import static java.util.Collections.emptyList;
-
-import java.util.ArrayList;
+import java.time.LocalDate;
 //import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -26,8 +24,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.patient.MedicalHistory;
-import org.openlmis.dispensing.domain.patient.Patient;
 
 @Data
 @AllArgsConstructor
@@ -36,33 +32,35 @@ import org.openlmis.dispensing.domain.patient.Patient;
 public class PatientDto {
   private UUID id;
   private String patientNumber;
+  private UUID facilityId;
+  private LocalDate registrationDate;
   private PersonDto personDto;
   private List<MedicalHistoryDto> medicalHistory;
 
-  /**
-   * Convert dto to jpa model.
-   *
-   * @return the converted jpa model object.
-   */
-  public Patient toPatient() {
-    Patient patient = new Patient(
-        patientNumber, personDto.toPerson(), medicalHistory()
-    );
-    return patient;
-  }
+  // /**
+  //  * Convert dto to jpa model.
+  //  *
+  //  * @return the converted jpa model object.
+  //  */
+  // public Patient toPatient() {
+  //   Patient patient = new Patient(
+  //       patientNumber, personDto.toPerson(), medicalHistory()
+  //   );
+  //   return patient;
+  // }
 
-  /**
-   * Gets medical history as {@link MedicalHistory}.
-   */
-  public List<MedicalHistory> medicalHistory() {
-    if (null == medicalHistory) {
-      return emptyList();
-    }
+  // /**
+  //  * Gets medical history as {@link MedicalHistory}.
+  //  */
+  // public List<MedicalHistory> medicalHistory() {
+  //   if (null == medicalHistory) {
+  //     return emptyList();
+  //   }
 
-    List<MedicalHistory> medicalHistoryList = new ArrayList<>();
-    for (MedicalHistoryDto medicalHistoryDto : medicalHistory) {
-      medicalHistoryList.add(medicalHistoryDto.toMedicalHistory());
-    }
-    return medicalHistoryList;
-  }
+  //   List<MedicalHistory> medicalHistoryList = new ArrayList<>();
+  //   for (MedicalHistoryDto medicalHistoryDto : medicalHistory) {
+  //     medicalHistoryList.add(medicalHistoryDto.toMedicalHistory());
+  //   }
+  //   return medicalHistoryList;
+  // }
 }
