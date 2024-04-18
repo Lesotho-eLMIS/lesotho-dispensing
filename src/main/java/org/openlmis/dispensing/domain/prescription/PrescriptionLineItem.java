@@ -15,15 +15,14 @@
 
 package org.openlmis.dispensing.domain.prescription;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.BaseEntity;
-
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.openlmis.dispensing.domain.BaseEntity;
 
 @Entity
 @Data

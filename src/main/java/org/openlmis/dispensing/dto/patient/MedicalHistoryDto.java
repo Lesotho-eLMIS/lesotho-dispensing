@@ -15,13 +15,12 @@
 
 package org.openlmis.dispensing.dto.patient;
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.patient.MedicalHistory;
-
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
