@@ -15,6 +15,13 @@
 
 package org.openlmis.dispensing.web;
 
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
+import java.util.List;
+import java.util.UUID;
 import org.openlmis.dispensing.dto.patient.PatientDto;
 import org.openlmis.dispensing.service.patient.PatientService;
 import org.slf4j.Logger;
@@ -24,21 +31,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
-
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
  * Controller used to perform CRUD operations on point of delivery event.
  */
 @Controller
-@RequestMapping("/api/patient")
+@org.springframework.web.bind.annotation.RequestMapping("/api/patient")
 public class PatientController extends BaseController {
   public static final String ID_PATH_VARIABLE = "/{id}";
   private static final Logger LOGGER = LoggerFactory.getLogger(PatientController.class);
@@ -53,9 +51,9 @@ public class PatientController extends BaseController {
    * @return created patient's ID.
    */
   @Transactional
-  @RequestMapping(method = POST)
+  @org.springframework.web.bind.annotation.RequestMapping(method = POST)
   public ResponseEntity<UUID> createPatient(
-      @RequestBody PatientDto patientDto) {
+      @org.springframework.web.bind.annotation.RequestBody PatientDto patientDto) {
 
     LOGGER.debug("Try to create a patient");
 
@@ -79,12 +77,12 @@ public class PatientController extends BaseController {
    * @param dateOfBirth   patient date of birth.
    * @return List of patients matching the given attributes.
    */
-  @RequestMapping(method = GET)
+  @org.springframework.web.bind.annotation.RequestMapping(method = GET)
   public ResponseEntity<List<PatientDto>> searchPatients(
-      @RequestParam(required = false) String patientNumber,
-      @RequestParam(required = false) String firstName,
-      @RequestParam(required = false) String lastName,
-      @RequestParam(required = false) String dateOfBirth) {
+      @org.springframework.web.bind.annotation.RequestParam(required = false) String patientNumber,
+      @org.springframework.web.bind.annotation.RequestParam(required = false) String firstName,
+      @org.springframework.web.bind.annotation.RequestParam(required = false) String lastName,
+      @org.springframework.web.bind.annotation.RequestParam(required = false) String dateOfBirth) {
     List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dateOfBirth);
     return new ResponseEntity<>(patientDtos, OK);
   }
@@ -97,11 +95,11 @@ public class PatientController extends BaseController {
    * @return Updates Patient dto.
    */
   @Transactional
-  @PutMapping(ID_PATH_VARIABLE)
-  @ResponseStatus(OK)
-  @ResponseBody
-  public ResponseEntity<PatientDto> updatePatient(@PathVariable UUID id,
-                                                  @RequestBody PatientDto dto) {
+  @org.springframework.web.bind.annotation.PutMapping(ID_PATH_VARIABLE)
+  @org.springframework.web.bind.annotation.ResponseStatus(OK)
+  @org.springframework.web.bind.annotation.ResponseBody
+  public ResponseEntity<PatientDto> updatePatient(@org.springframework.web.bind.annotation.PathVariable UUID id,
+                                                  @org.springframework.web.bind.annotation.RequestBody PatientDto dto) {
     PatientDto updatedPatient = patientService.updatePatient(id, dto);
     return new ResponseEntity<>(updatedPatient, OK);
   }

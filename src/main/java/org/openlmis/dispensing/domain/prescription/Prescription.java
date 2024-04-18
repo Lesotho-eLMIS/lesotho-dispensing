@@ -15,17 +15,17 @@
 
 package org.openlmis.dispensing.domain.prescription;
 
+import java.time.LocalDate;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.BaseEntity;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Data

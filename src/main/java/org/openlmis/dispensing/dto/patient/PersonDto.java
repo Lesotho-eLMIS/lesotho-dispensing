@@ -15,19 +15,18 @@
 
 package org.openlmis.dispensing.dto.patient;
 
+import static java.util.Collections.emptyList;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.patient.Contact;
 import org.openlmis.dispensing.domain.patient.Person;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static java.util.Collections.emptyList;
 
 @Data
 @AllArgsConstructor
