@@ -19,12 +19,15 @@ import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.BaseEntity;
+import org.openlmis.dispensing.domain.patient.Patient;
 
 
 @Entity
@@ -43,7 +46,9 @@ public class Prescription extends BaseEntity {
   private String status;
   private String facilityId;
   private String userId;
-
+  @ManyToOne
+  @JoinColumn(name = "patient_id")
+  private Patient patient;
 
   @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<PrescriptionLineItem> lineItems;

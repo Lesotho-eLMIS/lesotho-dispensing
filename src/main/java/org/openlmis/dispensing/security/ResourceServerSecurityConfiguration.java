@@ -71,7 +71,7 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
       @Override
       protected void doFilterInternal(HttpServletRequest request,
                                       HttpServletResponse response, FilterChain filterChain)
-              throws ServletException, IOException {
+          throws ServletException, IOException {
         // We don't want to allow access to a resource with no token so clear
         // the security context in case it is actually an OAuth2Authentication
         if (tokenExtractor.extract(request) == null) {
@@ -83,14 +83,14 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
     http.csrf().disable();
 
     http
-            .authorizeRequests()
-            .antMatchers(
-                    "/dispensing",
-                    "/webjars/**",
-                    "/dispensing/webjars/**",
-                    "/dispensing/docs/**"
-            ).permitAll()
-            .antMatchers("/**").fullyAuthenticated();
+        .authorizeRequests()
+        .antMatchers(
+            "/dispensing",
+            "/webjars/**",
+            "/dispensing/webjars/**",
+            "/dispensing/docs/**"
+        ).permitAll()
+        .antMatchers("/**").fullyAuthenticated();
   }
 
   /**
@@ -128,6 +128,7 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
 
   /**
    * CorsConfigurationSource bean initializer.
+   *
    * @return cors configuration
    */
   @Bean
@@ -142,3 +143,4 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
     return source;
   }
 }
+

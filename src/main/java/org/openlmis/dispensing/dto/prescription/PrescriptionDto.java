@@ -27,6 +27,7 @@ import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.patient.Contact;
 import org.openlmis.dispensing.domain.prescription.Prescription;
 import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
+import org.openlmis.dispensing.dto.patient.PatientDto;
 
 @Data
 @AllArgsConstructor
@@ -43,6 +44,7 @@ public class PrescriptionDto {
   private String status;
   private String facilityId;
   private String userId;
+  private PatientDto patient;
   private List<PrescriptionLineItemDto> lineItems;
 
   /**
@@ -53,7 +55,7 @@ public class PrescriptionDto {
   public Prescription toPrescription() {
     return new Prescription(
         patientType, followUpDate, issueDate, createdDate, capturedDate, lastUpdate,
-        isVoided, status, facilityId, userId, lineItems()
+        isVoided, status, facilityId, userId, patient.toPatient(), lineItems()
     );
   }
 
