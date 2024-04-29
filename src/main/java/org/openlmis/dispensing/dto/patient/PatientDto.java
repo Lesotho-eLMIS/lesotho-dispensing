@@ -26,6 +26,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.patient.MedicalHistory;
 import org.openlmis.dispensing.domain.patient.Patient;
+import org.openlmis.dispensing.domain.prescription.Prescription;
+import org.openlmis.dispensing.dto.prescription.PrescriptionDto;
 
 @Data
 @AllArgsConstructor
@@ -36,6 +38,7 @@ public class PatientDto {
   private String patientNumber;
   private PersonDto personDto;
   private List<MedicalHistoryDto> medicalHistory;
+  private List<PrescriptionDto> prescriptions;
 
   /**
    * Convert dto to jpa model.
@@ -44,7 +47,10 @@ public class PatientDto {
    */
   public Patient toPatient() {
     return new Patient(
-        patientNumber, personDto.toPerson(), medicalHistory()
+        patientNumber,
+        personDto.toPerson(),
+        medicalHistory(),
+        prescriptions()
     );
   }
 
@@ -61,5 +67,20 @@ public class PatientDto {
       medicalHistoryList.add(medicalHistoryDto.toMedicalHistory());
     }
     return medicalHistoryList;
+  }
+
+  /**
+   * Gets prescriptions as {@link Prescription}.
+   */
+  public List<Prescription> prescriptions() { // Add this method
+    if (null == prescriptions) {
+      return emptyList();
+    }
+
+    List<Prescription> prescriptionList = new ArrayList<>();
+    for (PrescriptionDto prescriptionDto : prescriptions) {
+      prescriptionList.add(prescriptionDto.toPrescription());
+    }
+    return prescriptionList;
   }
 }

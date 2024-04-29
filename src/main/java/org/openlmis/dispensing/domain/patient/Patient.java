@@ -26,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.BaseEntity;
+import org.openlmis.dispensing.domain.prescription.Prescription;
 
 @Entity
 @Data
@@ -42,4 +43,6 @@ public class Patient extends BaseEntity {
 
   @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<MedicalHistory> medicalHistory;
+  @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Prescription> prescriptions;
 }

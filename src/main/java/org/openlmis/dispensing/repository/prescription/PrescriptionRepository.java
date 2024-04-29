@@ -25,6 +25,6 @@ import org.springframework.data.repository.query.Param;
 public interface PrescriptionRepository extends JpaRepository<Prescription, UUID>,
     JpaSpecificationExecutor<Prescription> {
 
-  List<Prescription> findByPatientNumber(@Param("patientNumber") String patientNumber);
+  List<Prescription> findByPatientPatientNumber(@Param("patientNumber") String patientNumber);
 
 }
