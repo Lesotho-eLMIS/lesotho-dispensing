@@ -23,6 +23,7 @@ import org.openlmis.dispensing.domain.prescription.Prescription;
 import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
 import org.openlmis.dispensing.dto.prescription.PrescriptionDto;
 import org.openlmis.dispensing.dto.prescription.PrescriptionLineItemDto;
+import org.openlmis.dispensing.repository.patient.PatientRepository;
 import org.openlmis.dispensing.repository.prescription.PrescriptionRepository;
 import org.openlmis.dispensing.util.PrescriptionSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class PrescriptionService {
   @Autowired
   private PrescriptionRepository prescriptionRepository;
+  @Autowired
+  private PatientRepository patientRepository;
 
   /**
    * Search for prescriptions.
@@ -45,7 +48,8 @@ public class PrescriptionService {
    */
   @Transactional(readOnly = true)
   public List<PrescriptionDto> searchPrescriptions(String firstName, String lastName, String dateOfBirth) {
-    Specification<Prescription> spec = PrescriptionSpecifications.bySearchCriteria(firstName, lastName, dateOfBirth);
+    List<String> patientIds = patientRepository.findPatientIds(firstName, lastName, dateOfBirth);
+    Specification<Prescription> spec = PrescriptionSpecifications.byPatientIds(patientIds);
     return prescriptionRepository.findAll(spec).stream()
         .map(this::prescriptionToDto)
         .collect(Collectors.toList());

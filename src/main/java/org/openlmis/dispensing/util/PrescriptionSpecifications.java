@@ -72,4 +72,19 @@ public class PrescriptionSpecifications {
       return cb.and(predicates.toArray(new Predicate[0]));
     };
   }
+
+  /**
+   * Specification.
+   *
+   * @return Specification.
+   */
+  public static Specification<Prescription> byPatientIds(List<String> patientIds) {
+    return (root, query, criteriaBuilder) -> {
+      if (patientIds != null && !patientIds.isEmpty()) {
+        return root.get("patientId").in(patientIds);
+      } else {
+        return criteriaBuilder.conjunction();
+      }
+    };
+  }
 }
