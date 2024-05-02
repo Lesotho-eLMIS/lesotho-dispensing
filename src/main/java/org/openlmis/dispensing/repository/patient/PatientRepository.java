@@ -25,8 +25,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface PatientRepository extends JpaRepository<Patient, UUID>,
     JpaSpecificationExecutor<Patient> {
-  List<Patient> findByPatientNumber(@Param("patientNumber") String patientNumber);
-
   @Query("SELECT p.id FROM Patient p JOIN p.person per WHERE per.firstName = :firstName AND per.lastName = :lastName AND per.dateOfBirth = :dateOfBirth")
   List<String> findPatientIds(@Param("firstName") String firstName, @Param("lastName") String lastName, @Param("dateOfBirth") String dateOfBirth);
 }
