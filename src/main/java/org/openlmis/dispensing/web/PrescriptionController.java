@@ -17,6 +17,7 @@ package org.openlmis.dispensing.web;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.util.List;
@@ -50,7 +51,6 @@ public class PrescriptionController extends BaseController {
   @Autowired
   private PrescriptionService prescriptionService;
 
-
   /**
    * Create prescription.
    *
@@ -80,7 +80,7 @@ public class PrescriptionController extends BaseController {
    * @param dateOfBirth patient date of birth.
    * @return List of prescriptions matching the given attributes.
    */
-  @org.springframework.web.bind.annotation.GetMapping
+  @RequestMapping(method = GET)
   public ResponseEntity<List<PrescriptionDto>> searchPrescriptions(@RequestParam(required = false) String firstName,
                                                                    @RequestParam(required = false) String lastName, @RequestParam(required = false) String dateOfBirth) {
     List<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptions(firstName, lastName, dateOfBirth);
