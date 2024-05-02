@@ -1,19 +1,23 @@
 version: "2"
+networks:
+  default:
+    external:
+      name: lesotho-ref-distro_default
 services:
   dispensing:
     image: openlmis/dispensing
-    links:
-      - db
-      - log
+    #    links:
+    ##      - db
+    ##      - log
     ports:
       - "8080"
     env_file: .env
-  db:
-    image: openlmis/postgres:12-debezium
-    ports:
-      - "5432"
-    env_file: .env
-  log:
-    image: openlmis/rsyslog:1
-    volumes:
-      - '../logs/dispensing:/var/log'
+#  db:
+#    image: openlmis/postgres:12-debezium
+#    ports:
+#      - "5432"
+#    env_file: .env
+#  log:
+#    image: openlmis/rsyslog:1
+#    volumes:
+#      - '../logs/dispensing:/var/log'
