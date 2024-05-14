@@ -338,4 +338,20 @@ public class PatientService {
     int countSoFar = patientRepository.countByFacilityId(facilityId);
     return facilityCode + "/" + datePart + "/" + String.format("%05d", countSoFar + 1);
   }
+
+  /**
+   * Get a Patient.
+   *
+   * @param id patient id.
+   *
+   * @return a patient dto.
+   */
+  public PatientDto getPatientById(UUID id) {
+    Optional<Patient> patienOptional = patientRepository.findById(id);
+
+    if (patienOptional.isPresent()) {
+      return patientToDto(patienOptional.get());
+    }
+    return null;
+  }
 }

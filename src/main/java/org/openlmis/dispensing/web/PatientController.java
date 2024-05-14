@@ -35,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 // import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 // import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -113,6 +114,18 @@ public class PatientController extends BaseController {
 
     List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dateOfBirth, facilityUuid, nationalId);
     return new ResponseEntity<>(patientDtos, OK);
+  }
+
+  /**
+   * Get patient with a given id (uuid).
+   * A patients matching the given id.
+   */
+  @GetMapping(ID_PATH_VARIABLE)
+  @ResponseStatus(OK)
+  @ResponseBody
+  public ResponseEntity<PatientDto> getPatien(@PathVariable UUID id) {
+    PatientDto patient = patientService.getPatientById(id);
+    return new ResponseEntity<>(patient, OK);
   }
 
   /**
