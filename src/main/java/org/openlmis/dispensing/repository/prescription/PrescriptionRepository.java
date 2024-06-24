@@ -15,6 +15,7 @@
 
 package org.openlmis.dispensing.repository.prescription;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.openlmis.dispensing.domain.prescription.Prescription;
@@ -24,7 +25,4 @@ import org.springframework.data.repository.query.Param;
 
 public interface PrescriptionRepository extends JpaRepository<Prescription, UUID>,
     JpaSpecificationExecutor<Prescription> {
-
-  List<Prescription> findByPatientPatientNumber(@Param("patientNumber") String patientNumber);
-
 }

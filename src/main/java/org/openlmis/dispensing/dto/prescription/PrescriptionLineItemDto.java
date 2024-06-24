@@ -15,11 +15,11 @@
 
 package org.openlmis.dispensing.dto.prescription;
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.prescription.Prescription;
 import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
 
 @Data
@@ -27,6 +27,7 @@ import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
 @NoArgsConstructor
 @Builder
 public class PrescriptionLineItemDto {
+  private UUID id;
   private String dosage;
   private Integer period;
   private String batchId;
@@ -36,7 +37,6 @@ public class PrescriptionLineItemDto {
   private String orderableId;
   private String substituteOrderableId;
   private String comments;
-  private Prescription prescription;
 
   /**
    * Convert dto to jpa model.
@@ -46,8 +46,9 @@ public class PrescriptionLineItemDto {
 
   public PrescriptionLineItem toPrescriptionLineItem() {
     return new PrescriptionLineItem(
-        dosage, period, batchId, quantityPrescribed, quantityDispensed, servedInternally, orderableId,
-        substituteOrderableId, comments, prescription
+        dosage, period, batchId, quantityPrescribed,
+        quantityDispensed, servedInternally, orderableId,
+        substituteOrderableId, comments
     );
   }
 }

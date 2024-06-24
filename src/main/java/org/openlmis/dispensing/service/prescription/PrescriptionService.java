@@ -15,17 +15,24 @@
 
 package org.openlmis.dispensing.service.prescription;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.openlmis.dispensing.domain.patient.Patient;
 import org.openlmis.dispensing.domain.prescription.Prescription;
 import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
+import org.openlmis.dispensing.dto.patient.PatientDto;
 import org.openlmis.dispensing.dto.prescription.PrescriptionDto;
 import org.openlmis.dispensing.dto.prescription.PrescriptionLineItemDto;
+import org.openlmis.dispensing.exception.ResourceNotFoundException;
 import org.openlmis.dispensing.repository.patient.PatientRepository;
 import org.openlmis.dispensing.repository.prescription.PrescriptionRepository;
-import org.openlmis.dispensing.util.PrescriptionSpecifications;
+import org.openlmis.dispensing.service.patient.PatientService;
+import org.openlmis.dispensing.service.referencedata.PatientDataService;
+import org.openlmis.dispensing.util.Message;
+import org.openlmis.dispensing.util.PrescriptionSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -37,6 +44,11 @@ public class PrescriptionService {
   private PrescriptionRepository prescriptionRepository;
   @Autowired
   private PatientRepository patientRepository;
+  @Autowired
+  private PatientDataService patientDataService;
+  @Autowired
+  private PatientService patientService;
+
 
   /**
    * Search for prescriptions.
@@ -46,14 +58,14 @@ public class PrescriptionService {
    * @param dateOfBirth patient date of birth.
    * @return List of prescriptions matching the criteria.
    */
-  @Transactional(readOnly = true)
-  public List<PrescriptionDto> searchPrescriptions(String firstName, String lastName, String dateOfBirth) {
-    List<String> patientIds = patientRepository.findPatientIds(firstName, lastName, dateOfBirth);
-    Specification<Prescription> spec = PrescriptionSpecifications.byPatientIds(patientIds);
-    return prescriptionRepository.findAll(spec).stream()
-        .map(this::prescriptionToDto)
-        .collect(Collectors.toList());
-  }
+//  @Transactional(readOnly = true)
+//  public List<PrescriptionDto> searchPrescriptions(String firstName, String lastName, String dateOfBirth) {
+//    List<String> patientIds = patientRepository.findPatientIds(firstName, lastName, dateOfBirth);
+//    Specification<Prescription> spec = PrescriptionSpecifications.byPatientIds(patientIds);
+//    return prescriptionRepository.findAll(spec).stream()
+//        .map(this::prescriptionToDto)
+//        .collect(Collectors.toList());
+//  }
 
   /**
    * Update a Prescription.
@@ -74,6 +86,21 @@ public class PrescriptionService {
     prescription = prescriptionRepository.save(prescription);
 
     return prescriptionToDto(prescription);
+  }
+
+  /**
+   * Update a PrescriptionLineItem.
+   */
+  public void updateLineItemEntity(PrescriptionLineItem lineItem, PrescriptionLineItemDto lineItemDto) {
+    lineItem.setDosage(lineItemDto.getDosage());
+    lineItem.setPeriod(lineItemDto.getPeriod());
+    lineItem.setBatchId(lineItemDto.getBatchId());
+    lineItem.setQuantityPrescribed(lineItemDto.getQuantityPrescribed());
+    lineItem.setQuantityDispensed(lineItemDto.getQuantityDispensed());
+    lineItem.setServedInternally(lineItemDto.getServedInternally());
+    lineItem.setOrderableId(lineItemDto.getOrderableId());
+    lineItem.setSubstituteOrderableId(lineItemDto.getSubstituteOrderableId());
+    lineItem.setComments(lineItemDto.getComments());
   }
 
   /**
@@ -98,23 +125,45 @@ public class PrescriptionService {
     if (null == prescriptionDto) {
       return null;
     }
-    Prescription prescription = new Prescription();
-    prescription.setPatientType(prescriptionDto.getPatientType());
-    prescription.setFollowUpDate(prescriptionDto.getFollowUpDate());
-    prescription.setIssueDate(prescriptionDto.getIssueDate());
-    prescription.setCreatedDate(prescriptionDto.getCreatedDate());
-    prescription.setCapturedDate(prescriptionDto.getCapturedDate());
-    prescription.setLastUpdate(prescriptionDto.getLastUpdate());
-    prescription.setIsVoided(prescriptionDto.getIsVoided());
-    prescription.setStatus(prescriptionDto.getStatus());
-    prescription.setFacilityId(prescriptionDto.getFacilityId());
-    prescription.setUserId(prescriptionDto.getUserId());
-    if (prescriptionDto.getLineItems() != null) {
-      prescription.setLineItems(prescriptionDto.getLineItems().stream()
-          .map(PrescriptionLineItemDto::toPrescriptionLineItem)
-          .collect(Collectors.toList()));
+
+    Optional<Patient> patient = patientRepository.findById(prescriptionDto.getPatientId());
+    if ( patient.isPresent()) {
+      Prescription prescription = new Prescription();
+      LocalDate today = LocalDate.now();
+      prescription.setPatient(patient.get());
+      prescription.setPatientType(prescriptionDto.getPatientType());
+      prescription.setFollowUpDate(prescriptionDto.getFollowUpDate());
+      prescription.setIssueDate(prescriptionDto.getIssueDate());
+      prescription.setCreatedDate(today);
+      prescription.setCapturedDate(today);
+      prescription.setLastUpdate(today);
+      prescription.setIsVoided(prescriptionDto.getIsVoided());
+      prescription.setStatus(prescriptionDto.getStatus());
+      prescription.setFacilityId(prescriptionDto.getFacilityId());
+      prescription.setUserId(prescriptionDto.getUserId());
+      if (prescriptionDto.getLineItems() != null) {
+        List<PrescriptionLineItem> lineItems = prescriptionDto.getLineItems().stream()
+            .map(lineItemDto -> {
+              PrescriptionLineItem lineItem = lineItemDto.toPrescriptionLineItem(); // No parameter passed
+              lineItem.setPrescription(prescription); // Set the prescription for each line item
+              return lineItem;
+            })
+            .collect(Collectors.toList());
+        prescription.setLineItems(lineItems);
+      }
+      return prescription;
     }
-    return prescription;
+    return null;
+  }
+
+  private PrescriptionLineItem convertToPrescriptionLineItemEntity(PrescriptionLineItemDto lineItemDto, Prescription prescription) {
+    if (lineItemDto == null) {
+      return null;
+    }
+    return new PrescriptionLineItem(lineItemDto.getDosage(), lineItemDto.getPeriod(),
+        lineItemDto.getBatchId(), lineItemDto.getQuantityPrescribed(), lineItemDto.getQuantityDispensed(),
+        lineItemDto.getServedInternally(), lineItemDto.getOrderableId(), lineItemDto.getSubstituteOrderableId(),
+        lineItemDto.getComments(), prescription);
   }
 
   /**
@@ -125,6 +174,8 @@ public class PrescriptionService {
    */
   private PrescriptionDto prescriptionToDto(Prescription prescription) {
     return PrescriptionDto.builder()
+        .id(prescription.getId())
+        .patientId(prescription.getPatient().getId())
         .patientType(prescription.getPatientType())
         .followUpDate(prescription.getFollowUpDate())
         .issueDate(prescription.getIssueDate())
@@ -155,6 +206,7 @@ public class PrescriptionService {
     }
 
     return PrescriptionLineItemDto.builder()
+        .id(lineItem.getId())
         .dosage(lineItem.getDosage())
         .period(lineItem.getPeriod())
         .batchId(lineItem.getBatchId())
@@ -164,7 +216,6 @@ public class PrescriptionService {
         .orderableId(lineItem.getOrderableId())
         .substituteOrderableId(lineItem.getSubstituteOrderableId())
         .comments(lineItem.getComments())
-        .prescription(lineItem.getPrescription())
         .build();
   }
 
@@ -202,9 +253,91 @@ public class PrescriptionService {
     if (prescriptionDto.getLineItems() != null) {
       prescription.getLineItems().clear();
       prescription.getLineItems().addAll(prescriptionDto.getLineItems().stream()
-          .map(PrescriptionLineItemDto::toPrescriptionLineItem)
+          .map(lineItemDto -> convertToPrescriptionLineItemEntity(lineItemDto, prescription))
           .collect(Collectors.toList()));
     }
+  }
+
+  /**
+   * Get a Prescription.
+   *
+   * @param id prescription id.
+   *
+   * @return a prescription dto.
+   */
+  public PrescriptionDto getPrescriptionById(UUID id) {
+    Optional<Prescription> prescriptionOptional = prescriptionRepository.findById(id);
+
+    if (prescriptionOptional.isPresent()) {
+      return prescriptionToDto(prescriptionOptional.get());
+    }
+    else {
+      throw new ResourceNotFoundException(new Message("Prescription id not found ", id));
+    }
+  }
+
+  /**
+   * Get a Prescription.
+   *
+   *
+   * @return a prescriptions dto.
+   */
+  public List<PrescriptionDto> getAllPrescriptions() {
+    List<Prescription> prescriptions = prescriptionRepository.findAll();
+    return prescriptions.stream()
+        .map(this::prescriptionToDto)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Set prescription to isVoided.
+   *
+   * @param id id of prescription to update
+   */
+  @Transactional
+  public void setIsVoided(UUID id) {
+    Optional<Prescription> optionalPrescription = prescriptionRepository.findById(id);
+    if (optionalPrescription.isPresent()) {
+      Prescription prescription = optionalPrescription.get();
+      prescription.setIsVoided(true);
+      prescriptionRepository.saveAndFlush(prescription);
+    }
+    else {
+      throw new ResourceNotFoundException(new Message("Prescription id not found ", id));
+    }
+  }
+
+  /**
+   * Get a Prescription based on parameters.
+   *
+   *
+   * @return a prescriptions dtos.
+   */
+  public List<PrescriptionDto> searchPrescriptions(String patientNumber, String firstName, String lastName, String dateOfBirth,
+                                                   UUID facilityUuid, String nationalId, String status, String patientType, Boolean isVoided, LocalDate followUpDate) {
+
+    // First, find the patients based on the given patient details
+    List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dateOfBirth, facilityUuid, nationalId);
+
+    // Extract the patient IDs from the found patients and convert them to string
+    List<UUID> patientIds = patientDtos.stream()
+        .map(PatientDto::getId)
+        .collect(Collectors.toList());
+    // Create the Specification
+    Specification<Prescription> spec = Specification
+        .where(PrescriptionSpecification.patientIdIn(patientIds))
+        .and(PrescriptionSpecification.statusEquals(status))
+        .and(PrescriptionSpecification.patientTypeEquals(patientType))
+        .and(PrescriptionSpecification.isVoidedEquals(isVoided))
+        .and(PrescriptionSpecification.followUpDateEquals(followUpDate));
+
+    // Then, search for prescriptions based on the Specification
+    List<Prescription> prescriptions = prescriptionRepository.findAll(spec);
+
+    // Convert Prescription entities to PrescriptionDto objects
+    return prescriptions.stream()
+        .map(this::prescriptionToDto)
+        .collect(Collectors.toList());
   }
 
 }

@@ -20,21 +20,28 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.flywaydb.core.internal.util.StringUtils;
 import org.openlmis.dispensing.dto.prescription.PrescriptionDto;
 import org.openlmis.dispensing.service.prescription.PrescriptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -80,11 +87,23 @@ public class PrescriptionController extends BaseController {
    * @param dateOfBirth patient date of birth.
    * @return List of prescriptions matching the given attributes.
    */
-  @RequestMapping(method = GET)
-  public ResponseEntity<List<PrescriptionDto>> searchPrescriptions(@RequestParam(required = false) String firstName,
-                                                                   @RequestParam(required = false) String lastName, @RequestParam(required = false) String dateOfBirth) {
-    List<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptions(firstName, lastName, dateOfBirth);
-    return new ResponseEntity<>(prescriptionDtos, OK);
+//  @RequestMapping(value = "/bypatient")
+//  public ResponseEntity<List<PrescriptionDto>> searchPrescriptions(@RequestParam(required = false) String firstName,
+//                                                                   @RequestParam(required = false) String lastName, @RequestParam(required = false) String dateOfBirth) {
+//    List<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptions(firstName, lastName, dateOfBirth);
+//    return new ResponseEntity<>(prescriptionDtos, OK);
+//  }
+
+  /**
+   * Get prescription with a given id (uuid).
+   * A prescriptions matching the given id.
+   */
+  @GetMapping(ID_PATH_VARIABLE)
+  @ResponseStatus(OK)
+  @ResponseBody
+  public ResponseEntity<PrescriptionDto> getPrescription(@PathVariable UUID id) {
+    PrescriptionDto prescription = prescriptionService.getPrescriptionById(id);
+    return new ResponseEntity<>(prescription, OK);
   }
 
   /**
@@ -102,6 +121,66 @@ public class PrescriptionController extends BaseController {
     PrescriptionDto updatedPrescription = prescriptionService.updatePrescription(id, dto);
     return new ResponseEntity<>(updatedPrescription, OK);
   }
+
+//  /**
+//   * Get all prescriptions.
+//   *
+//   * @return List of all prescriptions.
+//   */
+//  @GetMapping
+//  @ResponseStatus(OK)
+//  @ResponseBody
+//  public ResponseEntity<List<PrescriptionDto>> getAllPrescriptions() {
+//    List<PrescriptionDto> allPrescriptions = prescriptionService.getAllPrescriptions();
+//    return new ResponseEntity<>(allPrescriptions, OK);
+//  }
+
+  /**
+   * Makes prescription void.
+   *
+   * @param id prescription id.
+   */
+  @RequestMapping(value = "{id}/void", method = RequestMethod.POST)
+  @ResponseStatus(HttpStatus.OK)
+  public void deactivate(@PathVariable UUID id) {
+    LOGGER.debug("Try to make prescription with id: {} void", id);
+    prescriptionService.setIsVoided(id);
+    LOGGER.debug("prescription with id: {} made void", id);
+  }
+
+  /**
+   * Get prescriptions based on parameters.
+   *
+   * @return List of all prescriptions.
+   */
+  @GetMapping
+  @ResponseStatus
+  @ResponseBody
+//  @RequestMapping(value = "/prescriptions", method = RequestMethod.GET)
+  public ResponseEntity<List<PrescriptionDto>> searchPrescriptions(
+      @RequestParam(required = false) String patientNumber,
+      @RequestParam(required = false) String firstName,
+      @RequestParam(required = false) String lastName,
+      @RequestParam(required = false) String dateOfBirth,
+      @RequestParam(required = false) String facilityId,
+      @RequestParam(required = false) String nationalId,
+      @RequestParam(required = false) String status,
+      @RequestParam(required = false) String patientType,
+      @RequestParam(required = false) Boolean isVoided,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate followUpDate) {
+
+    // Convert facilityId to UUID if not null or empty
+    UUID facilityUuid = StringUtils.hasText(facilityId) ? UUID.fromString(facilityId) : null;
+
+    // Call the service method to search for prescriptions
+    List<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptions(
+        patientNumber, firstName, lastName, dateOfBirth, facilityUuid, nationalId,
+        status, patientType, isVoided, followUpDate);
+
+    // Return the response entity with the list of PrescriptionDto
+    return ResponseEntity.ok(prescriptionDtos);
+  }
+
 
 
 }

@@ -17,6 +17,7 @@ package org.openlmis.dispensing.domain.prescription;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -52,5 +53,4 @@ public class Prescription extends BaseEntity {
 
   @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<PrescriptionLineItem> lineItems;
-  //dates for events needed?? e.g. deceased, retired, created, etc.
 }

@@ -16,11 +16,13 @@
 package org.openlmis.dispensing.repository.patient;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import org.openlmis.dispensing.domain.patient.Patient;
 // import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface PatientRepository extends JpaRepository<Patient, UUID>,

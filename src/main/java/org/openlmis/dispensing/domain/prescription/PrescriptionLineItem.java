@@ -15,6 +15,7 @@
 
 package org.openlmis.dispensing.domain.prescription;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -40,8 +41,26 @@ public class PrescriptionLineItem extends BaseEntity {
   private String substituteOrderableId;
   private String comments;
 
+  @JsonIgnore
   @ManyToOne
   @JoinColumn(name = "prescription_id")
   private Prescription prescription;
-  //dates for events needed?? e.g. deceased, retired, created, etc.
+
+  /**
+   * Constructor for PrescriptionLineItem.
+   */
+  public PrescriptionLineItem(String dosage, Integer period, String batchId,
+                              Integer quantityDispensed, Integer quantityPrescribed,
+                              Boolean servedInternally, String orderableId, String substituteOrderableId,
+                              String comments) {
+    this.dosage = dosage;
+    this.batchId = batchId;
+    this.period = period;
+    this.quantityPrescribed = quantityPrescribed;
+    this.quantityDispensed = quantityDispensed;
+    this.servedInternally = servedInternally;
+    this.orderableId = orderableId;
+    this.substituteOrderableId = substituteOrderableId;
+    this.comments = comments;
+  }
 }

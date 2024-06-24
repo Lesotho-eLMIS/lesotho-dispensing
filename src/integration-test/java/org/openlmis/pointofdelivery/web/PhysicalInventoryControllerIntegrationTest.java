@@ -40,20 +40,13 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.dispensing.domain.JasperTemplate;
-import org.openlmis.dispensing.domain.physicalinventory.PhysicalInventory;
-import org.openlmis.dispensing.dto.PhysicalInventoryDto;
-import org.openlmis.dispensing.dto.PhysicalInventoryLineItemDto;
 import org.openlmis.dispensing.exception.ResourceNotFoundException;
 import org.openlmis.dispensing.exception.ValidationMessageException;
-import org.openlmis.dispensing.repository.PhysicalInventoriesRepository;
-import org.openlmis.dispensing.service.JasperReportService;
-import org.openlmis.dispensing.service.JasperTemplateService;
-import org.openlmis.dispensing.service.PhysicalInventoryService;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 
 @SuppressWarnings("PMD.TooManyMethods")
-public class PhysicalInventoryControllerIntegrationTest extends BaseWebIntegrationTest {
+public class PhysicalInventoryControllerIntegrationTest extends org.openlmis.dispensing.web.BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/physicalInventories";
   private static final String ID_URL = RESOURCE_URL + "/{id}";

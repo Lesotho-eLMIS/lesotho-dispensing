@@ -20,20 +20,23 @@ import static java.util.Collections.emptyList;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.patient.Contact;
+import org.openlmis.dispensing.domain.patient.Patient;
 import org.openlmis.dispensing.domain.prescription.Prescription;
 import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
-import org.openlmis.dispensing.dto.patient.PatientDto;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class PrescriptionDto {
+  private UUID id;
+  private UUID patientId;
   private String patientType;
   private LocalDate followUpDate;
   private LocalDate issueDate;
@@ -44,20 +47,9 @@ public class PrescriptionDto {
   private String status;
   private String facilityId;
   private String userId;
-  private PatientDto patient;
   private List<PrescriptionLineItemDto> lineItems;
 
-  /**
-   * Convert dto to jpa model.
-   *
-   * @return the converted jpa model object.
-   */
-  public Prescription toPrescription() {
-    return new Prescription(
-        patientType, followUpDate, issueDate, createdDate, capturedDate, lastUpdate,
-        isVoided, status, facilityId, userId, patient.toPatient(), lineItems()
-    );
-  }
+
 
   /**
    * Gets contacts as {@link Contact}.
