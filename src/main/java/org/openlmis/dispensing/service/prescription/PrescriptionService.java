@@ -58,14 +58,7 @@ public class PrescriptionService {
    * @param dateOfBirth patient date of birth.
    * @return List of prescriptions matching the criteria.
    */
-//  @Transactional(readOnly = true)
-//  public List<PrescriptionDto> searchPrescriptions(String firstName, String lastName, String dateOfBirth) {
-//    List<String> patientIds = patientRepository.findPatientIds(firstName, lastName, dateOfBirth);
-//    Specification<Prescription> spec = PrescriptionSpecifications.byPatientIds(patientIds);
-//    return prescriptionRepository.findAll(spec).stream()
-//        .map(this::prescriptionToDto)
-//        .collect(Collectors.toList());
-//  }
+
 
   /**
    * Update a Prescription.
