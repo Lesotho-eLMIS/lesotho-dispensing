@@ -17,11 +17,9 @@ package org.openlmis.dispensing.web;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.flywaydb.core.internal.util.StringUtils;
@@ -79,20 +77,6 @@ public class PrescriptionController extends BaseController {
     return stopProfiler(profiler, response);
   }
 
-  /**
-   * List prescriptions matching the given attributes.
-   *
-   * @param firstName   patient first name.
-   * @param lastName    patient last name.
-   * @param dateOfBirth patient date of birth.
-   * @return List of prescriptions matching the given attributes.
-   */
-//  @RequestMapping(value = "/bypatient")
-//  public ResponseEntity<List<PrescriptionDto>> searchPrescriptions(@RequestParam(required = false) String firstName,
-//                                                                   @RequestParam(required = false) String lastName, @RequestParam(required = false) String dateOfBirth) {
-//    List<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptions(firstName, lastName, dateOfBirth);
-//    return new ResponseEntity<>(prescriptionDtos, OK);
-//  }
 
   /**
    * Get prescription with a given id (uuid).
@@ -121,19 +105,6 @@ public class PrescriptionController extends BaseController {
     PrescriptionDto updatedPrescription = prescriptionService.updatePrescription(id, dto);
     return new ResponseEntity<>(updatedPrescription, OK);
   }
-
-//  /**
-//   * Get all prescriptions.
-//   *
-//   * @return List of all prescriptions.
-//   */
-//  @GetMapping
-//  @ResponseStatus(OK)
-//  @ResponseBody
-//  public ResponseEntity<List<PrescriptionDto>> getAllPrescriptions() {
-//    List<PrescriptionDto> allPrescriptions = prescriptionService.getAllPrescriptions();
-//    return new ResponseEntity<>(allPrescriptions, OK);
-//  }
 
   /**
    * Makes prescription void.
