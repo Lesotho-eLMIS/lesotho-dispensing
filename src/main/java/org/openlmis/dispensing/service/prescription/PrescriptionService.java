@@ -30,7 +30,6 @@ import org.openlmis.dispensing.exception.ResourceNotFoundException;
 import org.openlmis.dispensing.repository.patient.PatientRepository;
 import org.openlmis.dispensing.repository.prescription.PrescriptionRepository;
 import org.openlmis.dispensing.service.patient.PatientService;
-import org.openlmis.dispensing.service.referencedata.PatientDataService;
 import org.openlmis.dispensing.util.Message;
 import org.openlmis.dispensing.util.PrescriptionSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +43,6 @@ public class PrescriptionService {
   private PrescriptionRepository prescriptionRepository;
   @Autowired
   private PatientRepository patientRepository;
-  @Autowired
-  private PatientDataService patientDataService;
   @Autowired
   private PatientService patientService;
 
@@ -120,7 +117,7 @@ public class PrescriptionService {
     }
 
     Optional<Patient> patient = patientRepository.findById(prescriptionDto.getPatientId());
-    if ( patient.isPresent()) {
+    if (patient.isPresent()) {
       Prescription prescription = new Prescription();
       LocalDate today = LocalDate.now();
       prescription.setPatient(patient.get());
@@ -263,8 +260,7 @@ public class PrescriptionService {
 
     if (prescriptionOptional.isPresent()) {
       return prescriptionToDto(prescriptionOptional.get());
-    }
-    else {
+    } else {
       throw new ResourceNotFoundException(new Message("Prescription id not found ", id));
     }
   }
@@ -294,8 +290,7 @@ public class PrescriptionService {
       Prescription prescription = optionalPrescription.get();
       prescription.setIsVoided(true);
       prescriptionRepository.saveAndFlush(prescription);
-    }
-    else {
+    } else {
       throw new ResourceNotFoundException(new Message("Prescription id not found ", id));
     }
   }

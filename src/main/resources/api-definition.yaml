@@ -317,30 +317,66 @@ traits:
                 schema: localizedMessage
             description: Provided query parameters are not correctly formatted.
 
+    post:
+      is: [ secured ]
+      description: Create a new point of delivery event.
+      body:
+        application/json:
+          schema: patientDto
+
+      responses:
+        201:
+          description: Point of delivery event has been processed with no validation error or persistence error.
+          headers:
+            Keep-Alive:
+          body:
+            application/json:
+              schema: uuid
+
+        400:
+          description: Failed to process point of delivery event due to validation error.
+          body:
+            application/json:
+              schema: localizedMessage
+
+        403:
+          description: User does not have permission to create point of delivery events for given facility (destination).
+          body:
+            application/json:
+              schema: localizedMessage
+    
+    /{id}/void:
+      uriParameters:
+        id:
+          displayName: id
+          type: string
+          required: true
+          repeat: false
       post:
         is: [ secured ]
-        description: Create a new point of delivery event.
+        description: Void a prescription.
         body:
           application/json:
-            schema: patientDto
+            schema: pointOfDeliveryEventDto
 
         responses:
-          201:
-            description: Point of delivery event has been processed with no validation error or persistence error.
+          200:
+            description: Point of delivery event updated.
             headers:
               Keep-Alive:
             body:
               application/json:
-                schema: uuid
-
+                schema: pointOfDeliveryEventDto
           400:
-            description: Failed to process point of delivery event due to validation error.
             body:
               application/json:
                 schema: localizedMessage
+            description: An error occured during request processing.
 
           403:
-            description: User does not have permission to create point of delivery events for given facility (destination).
+            description: User does not have permission to save a point of delivery event.
             body:
               application/json:
                 schema: localizedMessage
+
+    

@@ -17,7 +17,6 @@ package org.openlmis.dispensing.domain.prescription;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
