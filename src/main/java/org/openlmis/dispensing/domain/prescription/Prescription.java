@@ -17,6 +17,8 @@ package org.openlmis.dispensing.domain.prescription;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -44,8 +46,8 @@ public class Prescription extends BaseEntity {
   private LocalDate lastUpdate;
   private Boolean isVoided;
   private String status;
-  private String facilityId;
-  private String userId;
+  private UUID facilityId;
+  private UUID userId;
   @ManyToOne
   @JoinColumn(name = "patient_id")
   private Patient patient;

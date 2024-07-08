@@ -16,6 +16,7 @@
 package org.openlmis.dispensing.service.prescription;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,7 +47,6 @@ public class PrescriptionService {
   @Autowired
   private PatientService patientService;
 
-
   /**
    * Search for prescriptions.
    *
@@ -55,7 +55,6 @@ public class PrescriptionService {
    * @param dateOfBirth patient date of birth.
    * @return List of prescriptions matching the criteria.
    */
-
 
   /**
    * Update a Prescription.
@@ -84,7 +83,7 @@ public class PrescriptionService {
   public void updateLineItemEntity(PrescriptionLineItem lineItem, PrescriptionLineItemDto lineItemDto) {
     lineItem.setDosage(lineItemDto.getDosage());
     lineItem.setPeriod(lineItemDto.getPeriod());
-    lineItem.setBatchId(lineItemDto.getBatchId());
+    lineItem.setLotId(lineItemDto.getLotId());
     lineItem.setQuantityPrescribed(lineItemDto.getQuantityPrescribed());
     lineItem.setQuantityDispensed(lineItemDto.getQuantityDispensed());
     lineItem.setServedInternally(lineItemDto.getServedInternally());
@@ -146,12 +145,13 @@ public class PrescriptionService {
     return null;
   }
 
-  private PrescriptionLineItem convertToPrescriptionLineItemEntity(PrescriptionLineItemDto lineItemDto, Prescription prescription) {
+  private PrescriptionLineItem convertToPrescriptionLineItemEntity(PrescriptionLineItemDto lineItemDto,
+      Prescription prescription) {
     if (lineItemDto == null) {
       return null;
     }
     return new PrescriptionLineItem(lineItemDto.getDosage(), lineItemDto.getPeriod(),
-        lineItemDto.getBatchId(), lineItemDto.getQuantityPrescribed(), lineItemDto.getQuantityDispensed(),
+        lineItemDto.getLotId(), lineItemDto.getQuantityPrescribed(), lineItemDto.getQuantityDispensed(),
         lineItemDto.getServedInternally(), lineItemDto.getOrderableId(), lineItemDto.getSubstituteOrderableId(),
         lineItemDto.getComments(), prescription);
   }
@@ -178,8 +178,8 @@ public class PrescriptionService {
         .userId(prescription.getUserId())
         .lineItems(prescription.getLineItems() != null
             ? prescription.getLineItems().stream()
-            .map(this::lineItemToDto)
-            .collect(Collectors.toList())
+                .map(this::lineItemToDto)
+                .collect(Collectors.toList())
             : null)
         .build();
   }
@@ -199,7 +199,7 @@ public class PrescriptionService {
         .id(lineItem.getId())
         .dosage(lineItem.getDosage())
         .period(lineItem.getPeriod())
-        .batchId(lineItem.getBatchId())
+        .lotId(lineItem.getLotId())
         .quantityPrescribed(lineItem.getQuantityPrescribed())
         .quantityDispensed(lineItem.getQuantityDispensed())
         .servedInternally(lineItem.getServedInternally())
@@ -301,11 +301,18 @@ public class PrescriptionService {
    *
    * @return a prescriptions dtos.
    */
-  public List<PrescriptionDto> searchPrescriptions(String patientNumber, String firstName, String lastName, String dateOfBirth,
-                                                   UUID facilityUuid, String nationalId, String status, String patientType, Boolean isVoided, LocalDate followUpDate) {
+  public List<PrescriptionDto> searchPrescriptions(String patientNumber, String firstName, String lastName,
+      String dateOfBirth,
+      UUID facilityUuid, String nationalId, String status, String patientType, Boolean isVoided,
+      LocalDate followUpDate) {
 
     // First, find the patients based on the given patient details
-    List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dateOfBirth, facilityUuid, nationalId);
+    List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dateOfBirth,
+        facilityUuid, nationalId);
+
+    if (patientDtos.isEmpty()) {
+      return new ArrayList<PrescriptionDto>();
+    }
 
     // Extract the patient IDs from the found patients and convert them to string
     List<UUID> patientIds = patientDtos.stream()
@@ -323,9 +330,13 @@ public class PrescriptionService {
     List<Prescription> prescriptions = prescriptionRepository.findAll(spec);
 
     // Convert Prescription entities to PrescriptionDto objects
-    return prescriptions.stream()
-        .map(this::prescriptionToDto)
-        .collect(Collectors.toList());
+    // return prescriptions.stream()
+    // .map(this::prescriptionToDto)
+    // .collect(Collectors.toList());
+    return prescriptions == null ? new ArrayList<PrescriptionDto>()
+        : prescriptions.stream()
+            .map(this::prescriptionToDto)
+            .collect(Collectors.toList());
   }
 
 }

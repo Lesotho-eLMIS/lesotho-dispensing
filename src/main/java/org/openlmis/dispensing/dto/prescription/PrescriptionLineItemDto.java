@@ -30,12 +30,12 @@ public class PrescriptionLineItemDto {
   private UUID id;
   private String dosage;
   private Integer period;
-  private String batchId;
+  private UUID lotId;
   private Integer quantityPrescribed;
   private Integer quantityDispensed;
   private Boolean servedInternally;
-  private String orderableId;
-  private String substituteOrderableId;
+  private UUID orderableId;
+  private UUID substituteOrderableId;
   private String comments;
 
   /**
@@ -46,9 +46,8 @@ public class PrescriptionLineItemDto {
 
   public PrescriptionLineItem toPrescriptionLineItem() {
     return new PrescriptionLineItem(
-        dosage, period, batchId, quantityPrescribed,
+        dosage, period, lotId, quantityPrescribed,
         quantityDispensed, servedInternally, orderableId,
-        substituteOrderableId, comments
-    );
+        substituteOrderableId, comments);
   }
 }

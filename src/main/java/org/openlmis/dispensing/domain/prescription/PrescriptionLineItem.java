@@ -16,6 +16,9 @@
 package org.openlmis.dispensing.domain.prescription;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.UUID;
+
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -33,12 +36,12 @@ import org.openlmis.dispensing.domain.BaseEntity;
 public class PrescriptionLineItem extends BaseEntity {
   private String dosage;
   private Integer period;
-  private String batchId;
+  private UUID lotId;
   private Integer quantityPrescribed;
   private Integer quantityDispensed;
   private Boolean servedInternally;
-  private String orderableId;
-  private String substituteOrderableId;
+  private UUID orderableId;
+  private UUID substituteOrderableId;
   private String comments;
 
   @JsonIgnore
@@ -49,12 +52,12 @@ public class PrescriptionLineItem extends BaseEntity {
   /**
    * Constructor for PrescriptionLineItem.
    */
-  public PrescriptionLineItem(String dosage, Integer period, String batchId,
-                              Integer quantityDispensed, Integer quantityPrescribed,
-                              Boolean servedInternally, String orderableId, String substituteOrderableId,
-                              String comments) {
+  public PrescriptionLineItem(String dosage, Integer period, UUID lotId,
+      Integer quantityDispensed, Integer quantityPrescribed,
+      Boolean servedInternally, UUID orderableId, UUID substituteOrderableId,
+      String comments) {
     this.dosage = dosage;
-    this.batchId = batchId;
+    this.lotId = lotId;
     this.period = period;
     this.quantityPrescribed = quantityPrescribed;
     this.quantityDispensed = quantityDispensed;

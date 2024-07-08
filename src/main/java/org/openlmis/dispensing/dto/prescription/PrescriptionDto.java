@@ -43,8 +43,8 @@ public class PrescriptionDto {
   private LocalDate lastUpdate;
   private Boolean isVoided;
   private String status;
-  private String facilityId;
-  private String userId;
+  private UUID facilityId;
+  private UUID userId;
   private List<PrescriptionLineItemDto> lineItems;
 
 
