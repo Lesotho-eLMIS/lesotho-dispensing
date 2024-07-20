@@ -12,12 +12,12 @@
       "format": "uuid"
     },
     "person": {
-      "$ref": "personDto"
+      "$ref": "personDto.json"
     },
     "medicalHistory": {
       "type": "array",
       "items": {
-        "$ref": "medicalHistoryDto"
+        "$ref": "medicalHistoryDto.json"
       }
     }
   },

@@ -420,6 +420,4 @@ traits:
             description: User does not have permission to save a prescription.
             body:
               application/json:
-                schema: localizedMessage
-
-    
+                schema: localizedMessage    

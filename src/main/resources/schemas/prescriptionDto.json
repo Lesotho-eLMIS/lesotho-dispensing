@@ -51,7 +51,7 @@
     "lineItems": {
       "type": "array",
       "items": {
-        "$ref": "prescriptionLineItemDto"
+        "$ref": "prescriptionLineItemDto.json"
       }
     }
   },
