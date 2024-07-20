@@ -30,30 +30,9 @@
       "type": "array",
       "description": "A list of contacts associated with the person.",
       "items": {
-        "$ref": "#/definitions/contactDto"
+        "type": "object",
+        "$ref": "contactDto.json"
       }
-    }
-  },
-  "required": ["id", "nationalId", "firstName", "lastName", "dateOfBirth"],
-  "definitions": {
-    "contactDto": {
-      "type": "object",
-      "properties": {
-        "contactType": {
-          "type": "string",
-          "description": "The type of the contact information."
-        },
-        "contactValue": {
-          "type": "string",
-          "description": "The contact information."
-        },
-        "personId": {
-          "type": "string",
-          "format": "uuid",
-          "description": "The unique identifier of the associated person."
-        }
-      },
-      "required": ["contactType", "contactValue"]
     }
   }
 }

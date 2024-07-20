@@ -27,6 +27,5 @@
       "format": "date-time",
       "description": "The date and time when this record was created or recorded."
     }
-  },
-  "required": ["id", "type", "history", "patientId", "dateRecorded"]
+  }
 }

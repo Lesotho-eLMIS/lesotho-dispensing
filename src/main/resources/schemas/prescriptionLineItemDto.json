@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "description": "Prescription Lineitem",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "dosage": {
+      "type": "string"
+    },
+    "period": {
+      "type": "integer"
+    },
+    "lotId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "quantityPrescribed": {
+      "type": "integer"
+    },
+    "quantityDispensed": {
+      "type": "integer"
+    },
+    "servedInternally": {
+      "type": "boolean"
+    },
+    "orderableId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "substituteOrderableId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "comments": {
+      "type": "string"
+    }
+  },
+  "required": ["id", "dosage", "quantityPrescribed", "orderableId"]
+}
