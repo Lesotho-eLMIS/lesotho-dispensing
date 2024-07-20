@@ -97,7 +97,7 @@ public class PrescriptionService {
       return null;
     }
 
-    Prescription prescription = prescription;
+    Prescription prescription = existingPrescription.get();
     updatePrescriptionEntity(prescription, dto);
     prescription = prescriptionRepository.save(prescription);
 
@@ -157,8 +157,7 @@ public class PrescriptionService {
         }
       }
     }
-    
-    
+
     return prescriptionToDto(prescription);
   }
 
