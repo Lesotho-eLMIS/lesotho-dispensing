@@ -44,7 +44,8 @@ public class PrescriptionDto {
   private Boolean isVoided;
   private String status;
   private UUID facilityId;
-  private UUID userId;
+  private UUID prescribedByUserId;
+  private UUID servedByUserId;
   private List<PrescriptionLineItemDto> lineItems;
 
 

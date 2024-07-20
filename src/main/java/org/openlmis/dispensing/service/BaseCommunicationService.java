@@ -58,7 +58,7 @@ public abstract class BaseCommunicationService<T> {
   protected final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  private AuthService authService;
+  protected AuthService authService;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -66,7 +66,7 @@ public abstract class BaseCommunicationService<T> {
   @Value("${request.maxUrlLength}")
   private int maxUrlLength;
 
-  private RestOperations restTemplate = new RestTemplate();
+  protected RestOperations restTemplate = new RestTemplate();
 
   protected abstract String getServiceUrl();
 
@@ -133,8 +133,7 @@ public abstract class BaseCommunicationService<T> {
       if (HttpStatus.NOT_FOUND == ex.getStatusCode()) {
         logger.warn(
             "{} matching params does not exist. Params: {}",
-            getResultClass().getSimpleName(), parameters
-        );
+            getResultClass().getSimpleName(), parameters);
 
         return null;
       } else {
@@ -157,8 +156,7 @@ public abstract class BaseCommunicationService<T> {
 
     try {
       ResponseEntity<T[]> responseEntity = runWithTokenRetry(
-          () -> doListRequest(url, params, HttpMethod.GET, getArrayResultClass())
-      );
+          () -> doListRequest(url, params, HttpMethod.GET, getArrayResultClass()));
       return new ArrayList<>(Arrays.asList(responseEntity.getBody()));
     } catch (HttpStatusCodeException ex) {
       throw buildDataRetrievalException(ex);
@@ -173,8 +171,7 @@ public abstract class BaseCommunicationService<T> {
     try {
       RequestHeaders headers = RequestHeaders.init().setIfNoneMatch(etag);
       ResponseEntity<P[]> response = restTemplate.exchange(
-          url, HttpMethod.GET, RequestHelper.createEntity(null, addAuthHeader(headers)), type
-      );
+          url, HttpMethod.GET, RequestHelper.createEntity(null, addAuthHeader(headers)), type);
       logger.info("permissionStrings responseEntity: {}", response);
 
       if (response.getStatusCode() == HttpStatus.NOT_MODIFIED) {
@@ -189,7 +186,8 @@ public abstract class BaseCommunicationService<T> {
   }
 
   /**
-   * Return all reference data T objects for Page that need to be retrieved with POST request.
+   * Return all reference data T objects for Page that need to be retrieved with
+   * POST request.
    *
    * @param resourceUrl Endpoint url.
    * @param parameters  Map of query parameters.
@@ -201,9 +199,10 @@ public abstract class BaseCommunicationService<T> {
   }
 
   /**
-   * Return all reference data T objects for Page that need to be retrieved with GET request.
+   * Return all reference data T objects for Page that need to be retrieved with
+   * GET request.
    *
-   * @param parameters  Map of query parameters.
+   * @param parameters Map of query parameters.
    * @return Page of reference data T objects.
    */
   public Page<T> getPage(RequestParameters parameters) {
@@ -211,7 +210,8 @@ public abstract class BaseCommunicationService<T> {
   }
 
   /**
-   * Return all reference data T objects for Page that need to be retrieved with GET request.
+   * Return all reference data T objects for Page that need to be retrieved with
+   * GET request.
    *
    * @param resourceUrl Endpoint url.
    * @param parameters  Map of query parameters.
@@ -243,8 +243,7 @@ public abstract class BaseCommunicationService<T> {
 
     try {
       ResponseEntity<PageDto<P>> response = runWithTokenRetry(
-          () -> doPageRequest(url, parameters, payload, method, type)
-      );
+          () -> doPageRequest(url, parameters, payload, method, type));
       return response.getBody();
 
     } catch (HttpStatusCodeException ex) {
@@ -260,14 +259,13 @@ public abstract class BaseCommunicationService<T> {
         RequestHelper.createUri(url, parameters),
         HttpMethod.GET,
         createEntity(),
-        new DynamicParametrizedTypeReference<>(type)
-    ));
+        new DynamicParametrizedTypeReference<>(type)));
 
     return response.getBody();
   }
 
   protected <K, V> Map<K, V> getMap(String resourceUrl, RequestParameters parameters,
-                                    Class<K> keyType, Class<V> valueType) {
+      Class<K> keyType, Class<V> valueType) {
     String url = getServiceUrl() + getUrl() + StringUtils.defaultIfBlank(resourceUrl, "");
     TypeFactory factory = objectMapper.getTypeFactory();
     MapType mapType = factory.constructMapType(HashMap.class, keyType, valueType);
@@ -288,7 +286,7 @@ public abstract class BaseCommunicationService<T> {
   }
 
   private <E> ResponseEntity<E[]> doListRequest(String url, RequestParameters parameters,
-                                                HttpMethod method, Class<E[]> type) {
+      HttpMethod method, Class<E[]> type) {
     HttpEntity<Object> entity = createEntity();
     List<E[]> arrays = new ArrayList<>();
 
@@ -305,13 +303,12 @@ public abstract class BaseCommunicationService<T> {
   }
 
   private <E> ResponseEntity<PageDto<E>> doPageRequest(String url,
-                                                                      RequestParameters parameters,
-                                                                      Object payload,
-                                                                      HttpMethod method,
-                                                                      Class<E> type) {
+      RequestParameters parameters,
+      Object payload,
+      HttpMethod method,
+      Class<E> type) {
     HttpEntity<Object> entity = createEntity(payload);
-    ParameterizedTypeReference<PageDto<E>> parameterizedType =
-        new DynamicPageTypeReference<>(type);
+    ParameterizedTypeReference<PageDto<E>> parameterizedType = new DynamicPageTypeReference<>(type);
     List<PageDto<E>> pages = new ArrayList<>();
 
     for (URI uri : RequestHelper.splitRequest(url, parameters, maxUrlLength)) {
@@ -326,7 +323,7 @@ public abstract class BaseCommunicationService<T> {
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
 
-  private DataRetrievalException buildDataRetrievalException(HttpStatusCodeException ex) {
+  protected DataRetrievalException buildDataRetrievalException(HttpStatusCodeException ex) {
     return new DataRetrievalException(getResultClass().getSimpleName(), ex);
   }
 
@@ -370,5 +367,32 @@ public abstract class BaseCommunicationService<T> {
 
     ResponseEntity<T> run();
 
+  }
+
+  protected <P> ResponseEntity<P> runWithRetryAndTokenRetry(HttpTask<P> task) {
+    try {
+      return task.run();
+    } catch (HttpStatusCodeException ex) {
+      if (HttpStatus.UNAUTHORIZED == ex.getStatusCode()) {
+        // the token has (most likely) expired - clear the cache and retry once
+        authService.clearTokenCache();
+        return runWithRetry(task);
+      }
+      if (ex.getStatusCode().is4xxClientError() || ex.getStatusCode().is5xxServerError()) {
+        return runWithTokenRetry(task);
+      }
+      throw ex;
+    }
+  }
+
+  private <P> ResponseEntity<P> runWithRetry(HttpTask<P> task) {
+    try {
+      return task.run();
+    } catch (HttpStatusCodeException ex) {
+      if (ex.getStatusCode().is4xxClientError() || ex.getStatusCode().is5xxServerError()) {
+        return task.run();
+      }
+      throw ex;
+    }
   }
 }

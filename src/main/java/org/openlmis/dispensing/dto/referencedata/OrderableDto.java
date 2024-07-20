@@ -13,42 +13,38 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.dto.prescription;
+package org.openlmis.dispensing.dto.referencedata;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @Builder
-public class PrescriptionLineItemDto {
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+public class OrderableDto {
   private UUID id;
-  private String dosage;
-  private Integer period;
-  private UUID lotId;
-  private Integer quantityPrescribed;
-  private Integer quantityDispensed;
-  private Boolean servedInternally;
-  private UUID orderableId;
-  private UUID substituteOrderableId;
-  private String comments;
-  private UUID programId;
-
-  /**
-   * Convert dto to jpa model.
-   *
-   * @return the converted jpa model object.
-   */
-
-  public PrescriptionLineItem toPrescriptionLineItem() {
-    return new PrescriptionLineItem(
-        dosage, period, lotId, quantityPrescribed,
-        quantityDispensed, servedInternally, orderableId,
-        substituteOrderableId, comments, programId);
-  }
+  private String productCode;
+  private String fullProductName;
+  private String description;
+  private Long netContent;
+  private Integer packRoundingThreshold;
+  private Boolean roundToZero;
+  private Set<ProgramOrderableDto> programs;
+  private DispensableDto dispensable;
+  private Set<OrderableChildDto> children;
+  private Map<String, String> identifiers;
+  private Map<String, String> extraData;
+  private MetaDataDto meta = new MetaDataDto();
 }

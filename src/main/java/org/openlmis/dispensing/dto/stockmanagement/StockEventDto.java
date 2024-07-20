@@ -13,46 +13,24 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.domain.prescription;
+package org.openlmis.dispensing.dto.stockmanagement;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.BaseEntity;
-import org.openlmis.dispensing.domain.patient.Patient;
+import lombok.ToString;
 
-
-@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Prescription", schema = "dispensing")
-public class Prescription extends BaseEntity {
-  private String patientType;
-  private LocalDate followUpDate;
-  private LocalDate issueDate;
-  private LocalDate createdDate;
-  private LocalDate capturedDate;
-  private LocalDate lastUpdate;
-  private Boolean isVoided;
-  private String status;
+@Builder
+@ToString
+public class StockEventDto {
+  private UUID programId;
   private UUID facilityId;
-  private UUID prescribedByUserId;
-  private UUID servedByUserId;
-  @ManyToOne
-  @JoinColumn(name = "patient_id")
-  private Patient patient;
-
-  @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<PrescriptionLineItem> lineItems;
+  private List<StockEventLineItemDto> lineItems;
+  private UUID userId;
 }

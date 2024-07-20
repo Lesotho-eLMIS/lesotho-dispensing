@@ -13,42 +13,23 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.dto.prescription;
+package org.openlmis.dispensing.dto.referencedata;
 
-import java.util.UUID;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
+import lombok.Setter;
+import org.openlmis.dispensing.dto.ObjectReferenceDto;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class PrescriptionLineItemDto {
-  private UUID id;
-  private String dosage;
-  private Integer period;
-  private UUID lotId;
-  private Integer quantityPrescribed;
-  private Integer quantityDispensed;
-  private Boolean servedInternally;
-  private UUID orderableId;
-  private UUID substituteOrderableId;
-  private String comments;
-  private UUID programId;
+public class OrderableChildDto {
 
-  /**
-   * Convert dto to jpa model.
-   *
-   * @return the converted jpa model object.
-   */
+  @Getter
+  @Setter
+  private Integer quantity;
 
-  public PrescriptionLineItem toPrescriptionLineItem() {
-    return new PrescriptionLineItem(
-        dosage, period, lotId, quantityPrescribed,
-        quantityDispensed, servedInternally, orderableId,
-        substituteOrderableId, comments, programId);
-  }
+  @Getter
+  @Setter
+  private ObjectReferenceDto orderable;
 }

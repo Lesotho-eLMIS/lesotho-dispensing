@@ -13,42 +13,27 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.dto.prescription;
+package org.openlmis.dispensing.dto.stockmanagement;
 
+import java.time.LocalDate;
+//import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
+import lombok.ToString;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class PrescriptionLineItemDto {
-  private UUID id;
-  private String dosage;
-  private Integer period;
-  private UUID lotId;
-  private Integer quantityPrescribed;
-  private Integer quantityDispensed;
-  private Boolean servedInternally;
+@ToString
+public class StockEventLineItemDto {
   private UUID orderableId;
-  private UUID substituteOrderableId;
-  private String comments;
-  private UUID programId;
-
-  /**
-   * Convert dto to jpa model.
-   *
-   * @return the converted jpa model object.
-   */
-
-  public PrescriptionLineItem toPrescriptionLineItem() {
-    return new PrescriptionLineItem(
-        dosage, period, lotId, quantityPrescribed,
-        quantityDispensed, servedInternally, orderableId,
-        substituteOrderableId, comments, programId);
-  }
+  private UUID lotId;
+  private Integer quantity;
+  private LocalDate occurredDate;
+  private UUID reasonId;
+  // private List<StockEventAdjustmentDto> stockAdjustments;
 }

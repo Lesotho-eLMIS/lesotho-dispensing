@@ -17,6 +17,7 @@ package org.openlmis.dispensing.service.prescription;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,25 +28,51 @@ import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
 import org.openlmis.dispensing.dto.patient.PatientDto;
 import org.openlmis.dispensing.dto.prescription.PrescriptionDto;
 import org.openlmis.dispensing.dto.prescription.PrescriptionLineItemDto;
+import org.openlmis.dispensing.dto.referencedata.LotDto;
+import org.openlmis.dispensing.dto.referencedata.OrderableDto;
+import org.openlmis.dispensing.dto.stockmanagement.StockCardSummaryDto;
+import org.openlmis.dispensing.dto.stockmanagement.StockEventDto;
+import org.openlmis.dispensing.dto.stockmanagement.StockEventLineItemDto;
 import org.openlmis.dispensing.exception.ResourceNotFoundException;
 import org.openlmis.dispensing.repository.patient.PatientRepository;
 import org.openlmis.dispensing.repository.prescription.PrescriptionRepository;
 import org.openlmis.dispensing.service.patient.PatientService;
+import org.openlmis.dispensing.service.referencedata.LotReferenceDataService;
+import org.openlmis.dispensing.service.referencedata.OrderableReferenceDataService;
+import org.openlmis.dispensing.service.stockmanagement.StockCardSummariesStockManagementService;
+import org.openlmis.dispensing.service.stockmanagement.StockEventStockManagementService;
 import org.openlmis.dispensing.util.Message;
 import org.openlmis.dispensing.util.PrescriptionSpecification;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PrescriptionService {
+  private static final Logger LOGGER = LoggerFactory.getLogger(PrescriptionService.class);
+
   @Autowired
   private PrescriptionRepository prescriptionRepository;
   @Autowired
   private PatientRepository patientRepository;
   @Autowired
   private PatientService patientService;
+
+  @Autowired
+  private LotReferenceDataService lotReferenceDataService;
+
+  @Autowired
+  private StockCardSummariesStockManagementService stockCardSummariesStockManagementService;
+
+  @Autowired
+  private StockEventStockManagementService stockEventStockManagementService;
+
+  @Value("${dispensing.dispensingdebit.reasonId}")
+  private String dispensingDebitReasonId;
 
   /**
    * Search for prescriptions.
@@ -70,10 +97,68 @@ public class PrescriptionService {
       return null;
     }
 
-    Prescription prescription = existingPrescription.get();
+    Prescription prescription = prescription;
     updatePrescriptionEntity(prescription, dto);
     prescription = prescriptionRepository.save(prescription);
 
+    return prescriptionToDto(prescription);
+  }
+
+  /**
+   * Serve a Prescription.
+   *
+   * @param id  prescription id.
+   * @param dto prescription dto.
+   * @return a updated prescription dto.
+   */
+  public PrescriptionDto servePrescription(UUID id, PrescriptionDto dto) {
+    Optional<Prescription> existingPrescription = prescriptionRepository.findById(id);
+
+    if (!existingPrescription.isPresent()) {
+      return null;
+    }
+    Prescription prescription = existingPrescription.get();
+    // debit stock
+    for (PrescriptionLineItem prescriptionLineItem : prescription.getLineItems()) {
+      // Get SOH - call
+      LotDto lot = lotReferenceDataService
+          .findOne(prescriptionLineItem.getLotId());
+      List<StockCardSummaryDto> stockCardSummaries = stockCardSummariesStockManagementService
+          .search(
+              prescriptionLineItem.getProgramId(),
+              prescription.getFacilityId(),
+              Collections.singleton(prescriptionLineItem.getOrderableId()),
+              LocalDate.now(),
+              lot.getLotCode());
+
+      if (!stockCardSummaries.isEmpty()) {
+        Integer stockOnHand = stockCardSummaries.get(0).getStockOnHand();
+        if (prescriptionLineItem.getQuantityDispensed() <= stockOnHand) {
+          LOGGER.info("We have enough stock for product "
+              + prescriptionLineItem.getOrderableId());
+          // debit bulk orderable
+          StockEventDto stockEventDebit = new StockEventDto();
+          stockEventDebit.setFacilityId(prescription.getFacilityId());
+          stockEventDebit.setProgramId(prescriptionLineItem.getProgramId());
+          stockEventDebit.setUserId(prescription.getPrescribedByUserId());
+          StockEventLineItemDto lineItemDebit = new StockEventLineItemDto(
+              prescriptionLineItem.getOrderableId(),
+              prescriptionLineItem.getLotId(),
+              prescriptionLineItem.getQuantityDispensed(),
+              LocalDate.now(),
+              UUID.fromString(dispensingDebitReasonId));
+          stockEventDebit.setLineItems(Collections.singletonList(lineItemDebit));
+          // submit stock event to stockmanagement service
+          LOGGER.error("Submitting stockevent DR : " + stockEventDebit.toString());
+          stockEventStockManagementService.submit(stockEventDebit);
+
+          updatePrescriptionEntity(prescription, dto);
+          prescription = prescriptionRepository.save(prescription);
+        }
+      }
+    }
+    
+    
     return prescriptionToDto(prescription);
   }
 
@@ -129,7 +214,8 @@ public class PrescriptionService {
       prescription.setIsVoided(prescriptionDto.getIsVoided());
       prescription.setStatus(prescriptionDto.getStatus());
       prescription.setFacilityId(prescriptionDto.getFacilityId());
-      prescription.setUserId(prescriptionDto.getUserId());
+      prescription.setPrescribedByUserId(prescriptionDto.getPrescribedByUserId());
+      prescription.setServedByUserId(prescriptionDto.getServedByUserId());
       if (prescriptionDto.getLineItems() != null) {
         List<PrescriptionLineItem> lineItems = prescriptionDto.getLineItems().stream()
             .map(lineItemDto -> {
@@ -153,7 +239,7 @@ public class PrescriptionService {
     return new PrescriptionLineItem(lineItemDto.getDosage(), lineItemDto.getPeriod(),
         lineItemDto.getLotId(), lineItemDto.getQuantityPrescribed(), lineItemDto.getQuantityDispensed(),
         lineItemDto.getServedInternally(), lineItemDto.getOrderableId(), lineItemDto.getSubstituteOrderableId(),
-        lineItemDto.getComments(), prescription);
+        lineItemDto.getComments(), lineItemDto.getProgramId(), prescription);
   }
 
   /**
@@ -175,7 +261,7 @@ public class PrescriptionService {
         .isVoided(prescription.getIsVoided())
         .status(prescription.getStatus())
         .facilityId(prescription.getFacilityId())
-        .userId(prescription.getUserId())
+        .prescribedByUserId(prescription.getPrescribedByUserId())
         .lineItems(prescription.getLineItems() != null
             ? prescription.getLineItems().stream()
                 .map(this::lineItemToDto)
@@ -237,8 +323,11 @@ public class PrescriptionService {
     if (prescriptionDto.getFacilityId() != null) {
       prescription.setFacilityId(prescriptionDto.getFacilityId());
     }
-    if (prescriptionDto.getUserId() != null) {
-      prescription.setUserId(prescriptionDto.getUserId());
+    if (prescriptionDto.getPrescribedByUserId() != null) {
+      prescription.setPrescribedByUserId(prescriptionDto.getPrescribedByUserId());
+    }
+    if (prescriptionDto.getServedByUserId() != null) {
+      prescription.setServedByUserId(prescriptionDto.getServedByUserId());
     }
     if (prescriptionDto.getLineItems() != null) {
       prescription.getLineItems().clear();

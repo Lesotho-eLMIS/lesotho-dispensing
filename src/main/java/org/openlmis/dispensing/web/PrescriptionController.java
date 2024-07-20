@@ -62,7 +62,8 @@ public class PrescriptionController extends BaseController {
    */
   @Transactional
   @RequestMapping(method = POST)
-  public ResponseEntity<UUID> createPrescription(@org.springframework.web.bind.annotation.RequestBody PrescriptionDto prescriptionDto) {
+  public ResponseEntity<UUID> createPrescription(
+      @org.springframework.web.bind.annotation.RequestBody PrescriptionDto prescriptionDto) {
     LOGGER.debug("Try to create a prescription");
     Profiler profiler = getProfiler("CREATE_PRESCRIPTION", prescriptionDto);
 
@@ -74,7 +75,6 @@ public class PrescriptionController extends BaseController {
 
     return stopProfiler(profiler, response);
   }
-
 
   /**
    * Get prescription with a given id (uuid).
@@ -105,6 +105,22 @@ public class PrescriptionController extends BaseController {
   }
 
   /**
+   * Serve a Prescription.
+   *
+   * @param id  Prescription id.
+   * @param dto Prescription dto.
+   * @return Updated Prescription dto.
+   */
+  @Transactional
+  @RequestMapping(value = "/{id}/serve", method = POST)
+  @ResponseStatus(OK)
+  @ResponseBody
+  public ResponseEntity<PrescriptionDto> servePrescription(@PathVariable UUID id, @RequestBody PrescriptionDto dto) {
+    PrescriptionDto servedPrescription = prescriptionService.servePrescription(id, dto);
+    return new ResponseEntity<>(servedPrescription, OK);
+  }
+
+  /**
    * Makes prescription void.
    *
    * @param id prescription id.
@@ -126,7 +142,7 @@ public class PrescriptionController extends BaseController {
   @GetMapping
   @ResponseStatus
   @ResponseBody
-  //  @RequestMapping(value = "/prescriptions", method = RequestMethod.GET)
+  // @RequestMapping(value = "/prescriptions", method = RequestMethod.GET)
   public ResponseEntity<List<PrescriptionDto>> searchPrescriptions(
       @RequestParam(required = false) String patientNumber,
       @RequestParam(required = false) String firstName,
@@ -150,7 +166,5 @@ public class PrescriptionController extends BaseController {
     // Return the response entity with the list of PrescriptionDto
     return ResponseEntity.ok(prescriptionDtos);
   }
-
-
 
 }

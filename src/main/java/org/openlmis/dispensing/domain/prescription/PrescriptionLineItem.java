@@ -43,6 +43,7 @@ public class PrescriptionLineItem extends BaseEntity {
   private UUID orderableId;
   private UUID substituteOrderableId;
   private String comments;
+  private UUID programId;
 
   @JsonIgnore
   @ManyToOne
@@ -55,7 +56,7 @@ public class PrescriptionLineItem extends BaseEntity {
   public PrescriptionLineItem(String dosage, Integer period, UUID lotId,
       Integer quantityDispensed, Integer quantityPrescribed,
       Boolean servedInternally, UUID orderableId, UUID substituteOrderableId,
-      String comments) {
+      String comments, UUID programId) {
     this.dosage = dosage;
     this.lotId = lotId;
     this.period = period;
@@ -65,5 +66,6 @@ public class PrescriptionLineItem extends BaseEntity {
     this.orderableId = orderableId;
     this.substituteOrderableId = substituteOrderableId;
     this.comments = comments;
+    this.programId = programId;
   }
 }
