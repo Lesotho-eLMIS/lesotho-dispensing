@@ -13,47 +13,45 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.domain.patient;
+package org.openlmis.dispensing.domain.prescription;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.BaseEntity;
-import org.openlmis.dispensing.domain.prescription.Prescription;
+import org.openlmis.dispensing.domain.patient.Patient;
+
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "patient", schema = "dispensing")
-public class Patient extends BaseEntity {
-
-  @Column(nullable = false, unique = true)
-  private String patientNumber;
-
-  @Column(nullable = false)
+@Table(name = "Prescription", schema = "dispensing")
+public class Prescription extends BaseEntity {
+  private String patientType;
+  private LocalDate followUpDate;
+  private LocalDate issueDate;
+  private LocalDate createdDate;
+  private LocalDate capturedDate;
+  private LocalDate lastUpdate;
+  private Boolean isVoided;
+  private String status;
   private UUID facilityId;
+  private UUID userId;
+  @ManyToOne
+  @JoinColumn(name = "patient_id")
+  private Patient patient;
 
-  @Column(nullable = false)
-  private LocalDate registrationDate;
-
-  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "person_id", referencedColumnName = "id")
-  private Person person;
-
-  @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<MedicalHistory> medicalHistory;
-  @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Prescription> prescriptions;
+  @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<PrescriptionLineItem> lineItems;
 }

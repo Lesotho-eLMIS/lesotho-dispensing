@@ -32,7 +32,6 @@ import lombok.NoArgsConstructor;
 
 import org.openlmis.dispensing.domain.event.DispensingEvent;
 import org.openlmis.dispensing.domain.qualitychecks.Discrepancy;
-import org.openlmis.dispensing.dto.DiscrepancyDto;
 import org.openlmis.dispensing.util.DispensingEventProcessContext;
 
 @Data

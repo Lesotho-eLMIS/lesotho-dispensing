@@ -41,7 +41,7 @@ repositories {
     jcenter()
     maven { url "http://jasperreports.sourceforge.net/maven2/" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-    maven { url "https://jaspersoft.jfrog.io/artifactory/third-party-ce-artifacts"}
+    maven { url "https://jaspersoft.jfrog.io/artifactory/third-party-ce-artifacts" }
 }
 
 dependencies {
@@ -78,7 +78,7 @@ dependencies {
     testCompile('org.flywaydb.flyway-test-extensions:flyway-spring-test:4.1.0')
     testCompile 'org.springframework.security:spring-security-test'
     testCompile "org.springframework:spring-test"
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     testCompile "com.jayway.restassured:rest-assured:2.7.0"
     testCompile "guru.nidi.raml:raml-tester:0.8.15"
@@ -118,9 +118,6 @@ flyway {
     placeholderPrefix = '#['
     placeholderSuffix = ']'
 }
-
-
-
 
 
 tasks.withType(Test) {
@@ -247,7 +244,7 @@ artifacts {
     archives javadocJar, sourcesJar, execJar
 }
 
-signArchives.onlyIf {project.findProperty("signing.keyId") && project.findProperty("signing.password")}
+signArchives.onlyIf { project.findProperty("signing.keyId") && project.findProperty("signing.password") }
 
 uploadArchives {
     repositories {

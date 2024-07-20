@@ -13,32 +13,12 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.dto.patient;
+package org.openlmis.dispensing.domain.status;
 
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.patient.MedicalHistory;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class MedicalHistoryDto {
-  private UUID id;
-  private String type;
-  private String history;
-
-  /**
-   * Convert dto to jpa model.
-   *
-   * @return the converted jpa model object.
-   */
-  public MedicalHistory toMedicalHistory() {
-    return new MedicalHistory(
-        type, history
-    );
-  }
+public enum DispensingEventStatus {
+  INITIATED,
+  SERVED,
+  PARTIALLY_SERVED,
+  RETURNED,
+  CANCELLED
 }

@@ -24,17 +24,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import java.util.List;
 import java.util.UUID;
 import org.openlmis.dispensing.dto.DispensingEventDto;
-// import org.openlmis.dispensing.service.PermissionService;
 import org.openlmis.dispensing.service.DispensingEventProcessor;
 import org.openlmis.dispensing.service.DispensingService;
-import org.openlmis.dispensing.web.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.core.context.SecurityContextHolder;
-// import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,9 +51,6 @@ public class DispensingController extends BaseController {
   public static final String ID_PATH_VARIABLE = "/{id}";
   private static final Logger LOGGER = LoggerFactory.getLogger(DispensingController.class);
 
-  //   @Autowired
-  //   private PermissionService permissionService;
-
   @Autowired
   private DispensingEventProcessor pointOfDeliveryEventProcessor;
 
@@ -73,7 +66,7 @@ public class DispensingController extends BaseController {
   @Transactional
   @RequestMapping(method = POST)
   public ResponseEntity<UUID> createDispensingEvent(
-        @RequestBody DispensingEventDto pointOfDeliveryEventDto) {
+      @RequestBody DispensingEventDto pointOfDeliveryEventDto) {
 
     LOGGER.debug("Try to create a point of delivery event");
 
@@ -102,9 +95,9 @@ public class DispensingController extends BaseController {
 
     LOGGER.debug("Try to load point of delivery events");
 
-    List<DispensingEventDto> podsToReturn = 
+    List<DispensingEventDto> podsToReturn =
         pointOfDeliveryService.getDispensingEventsByDestinationId(destinationId);
-    
+
     return new ResponseEntity<>(podsToReturn, OK);
     // Profiler profiler = getProfiler("LIST_POD_EVENTS", pointOfDeliveryEventDto);
 
@@ -122,7 +115,7 @@ public class DispensingController extends BaseController {
   /**
    * Update a POD event.
    *
-   * @param id POD event id.
+   * @param id  POD event id.
    * @param dto POD dto.
    * @return created POD dto.
    */
@@ -131,7 +124,7 @@ public class DispensingController extends BaseController {
   @ResponseStatus(OK)
   @ResponseBody
   public ResponseEntity<DispensingEventDto> updateDispensingEvent(@PathVariable UUID id,
-                                                    @RequestBody DispensingEventDto dto) {
+                                                                  @RequestBody DispensingEventDto dto) {
     DispensingEventDto updatedPodEvent = pointOfDeliveryService
         .updateDispensingEvent(dto, id);
     return new ResponseEntity<>(updatedPodEvent, OK);

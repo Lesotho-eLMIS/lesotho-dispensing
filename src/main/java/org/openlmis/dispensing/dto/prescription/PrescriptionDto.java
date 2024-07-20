@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.dto.patient;
+package org.openlmis.dispensing.dto.prescription;
 
 import static java.util.Collections.emptyList;
 
@@ -26,54 +26,41 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.patient.Contact;
-import org.openlmis.dispensing.domain.patient.Person;
+import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PersonDto {
+public class PrescriptionDto {
   private UUID id;
-  private String firstName;
-  private String lastName;
-  private String nickName;
-  private String nationalId;
-  private String sex;
-  private LocalDate dateOfBirth;
-  private Boolean isDobEstimated;
-  private String physicalAddress;
-  private String nextOfKinFullName;
-  private String nextOfKinContact;
-  private String motherMaidenName;
-  private Boolean deceased;
-  private Boolean retired;
-  private List<ContactDto> contacts;
+  private UUID patientId;
+  private String patientType;
+  private LocalDate followUpDate;
+  private LocalDate issueDate;
+  private LocalDate createdDate;
+  private LocalDate capturedDate;
+  private LocalDate lastUpdate;
+  private Boolean isVoided;
+  private String status;
+  private UUID facilityId;
+  private UUID userId;
+  private List<PrescriptionLineItemDto> lineItems;
 
-  /**
-   * Convert dto to jpa model.
-   *
-   * @return the converted jpa model object.
-   */
-  public Person toPerson() {
-    return new Person(
-        firstName, lastName, nickName, nationalId, sex, dateOfBirth,
-        isDobEstimated, physicalAddress, nextOfKinFullName, nextOfKinContact,
-        motherMaidenName, deceased, retired, contacts()
-    );
-  }
+
 
   /**
    * Gets contacts as {@link Contact}.
    */
-  public List<Contact> contacts() {
-    if (null == contacts) {
+  public List<PrescriptionLineItem> lineItems() {
+    if (null == lineItems) {
       return emptyList();
     }
 
-    List<Contact> contactsList = new ArrayList<>();
-    for (ContactDto contactDto : contacts) {
-      contactsList.add(contactDto.toContact());
+    List<PrescriptionLineItem> lineItemList = new ArrayList<>();
+    for (PrescriptionLineItemDto prescriptionLineItemDto : lineItems) {
+      lineItemList.add(prescriptionLineItemDto.toPrescriptionLineItem());
     }
-    return contactsList;
+    return lineItemList;
   }
 }

@@ -13,32 +13,41 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.dto.patient;
+package org.openlmis.dispensing.dto.prescription;
 
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.openlmis.dispensing.domain.patient.MedicalHistory;
+import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MedicalHistoryDto {
+public class PrescriptionLineItemDto {
   private UUID id;
-  private String type;
-  private String history;
+  private String dosage;
+  private Integer period;
+  private UUID lotId;
+  private Integer quantityPrescribed;
+  private Integer quantityDispensed;
+  private Boolean servedInternally;
+  private UUID orderableId;
+  private UUID substituteOrderableId;
+  private String comments;
 
   /**
    * Convert dto to jpa model.
    *
    * @return the converted jpa model object.
    */
-  public MedicalHistory toMedicalHistory() {
-    return new MedicalHistory(
-        type, history
-    );
+
+  public PrescriptionLineItem toPrescriptionLineItem() {
+    return new PrescriptionLineItem(
+        dosage, period, lotId, quantityPrescribed,
+        quantityDispensed, servedInternally, orderableId,
+        substituteOrderableId, comments);
   }
 }

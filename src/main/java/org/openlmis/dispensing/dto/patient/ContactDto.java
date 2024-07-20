@@ -37,9 +37,8 @@ public class ContactDto {
    * @return the converted jpa model object.
    */
   public Contact toContact() {
-    Contact contact = new Contact(
+    return new Contact(
         contactType, contactValue
     );
-    return contact;
   }
 }
