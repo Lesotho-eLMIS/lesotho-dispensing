@@ -35,6 +35,16 @@ import org.openlmis.dispensing.domain.BaseEntity;
 @Table(name = "PrescriptionLineItem", schema = "dispensing")
 public class PrescriptionLineItem extends BaseEntity {
   private String dosage;
+  /* dose, doseUnits, doseFrequency, route, duration (period), 
+  durationUnits, additionalInstructions */
+  // private Integer dose;
+  // private String doseUnits;
+  // private String doseFrequency;
+  // private String route;
+  // private Integer duration;
+  // private String durationUnits;
+  // private String additionalInstructions;
+
   private Integer period;
   private UUID lotId;
   private Integer quantityPrescribed;
@@ -43,7 +53,8 @@ public class PrescriptionLineItem extends BaseEntity {
   private UUID orderableId;
   private UUID substituteOrderableId;
   private String comments;
-  private UUID programId;
+  private String status;
+  //private UUID programId;
 
   @JsonIgnore
   @ManyToOne
@@ -54,9 +65,9 @@ public class PrescriptionLineItem extends BaseEntity {
    * Constructor for PrescriptionLineItem.
    */
   public PrescriptionLineItem(String dosage, Integer period, UUID lotId,
-      Integer quantityDispensed, Integer quantityPrescribed,
+      Integer quantityPrescribed, Integer quantityDispensed,
       Boolean servedInternally, UUID orderableId, UUID substituteOrderableId,
-      String comments, UUID programId) {
+      String comments, String status) {
     this.dosage = dosage;
     this.lotId = lotId;
     this.period = period;
@@ -66,6 +77,7 @@ public class PrescriptionLineItem extends BaseEntity {
     this.orderableId = orderableId;
     this.substituteOrderableId = substituteOrderableId;
     this.comments = comments;
-    this.programId = programId;
+    this.status = status;
+    // this.programId = programId;
   }
 }

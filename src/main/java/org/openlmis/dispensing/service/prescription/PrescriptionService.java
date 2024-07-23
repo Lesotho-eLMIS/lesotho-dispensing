@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.openlmis.dispensing.domain.patient.Patient;
 import org.openlmis.dispensing.domain.prescription.Prescription;
 import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
+import org.openlmis.dispensing.domain.status.PrescriptionStatus;
 import org.openlmis.dispensing.dto.patient.PatientDto;
 import org.openlmis.dispensing.dto.prescription.PrescriptionDto;
 import org.openlmis.dispensing.dto.prescription.PrescriptionLineItemDto;
@@ -71,6 +72,9 @@ public class PrescriptionService {
   @Autowired
   private StockEventStockManagementService stockEventStockManagementService;
 
+  @Autowired
+  private OrderableReferenceDataService orderableReferenceDataService;
+
   @Value("${dispensing.dispensingdebit.reasonId}")
   private String dispensingDebitReasonId;
 
@@ -112,22 +116,43 @@ public class PrescriptionService {
    * @return a updated prescription dto.
    */
   public PrescriptionDto servePrescription(UUID id, PrescriptionDto dto) {
-    Optional<Prescription> existingPrescription = prescriptionRepository.findById(id);
+    Optional<Prescription> existingPrescriptionOpt = prescriptionRepository.findById(id);
 
-    if (!existingPrescription.isPresent()) {
+    if (!existingPrescriptionOpt.isPresent()) {
       return null;
     }
-    Prescription prescription = existingPrescription.get();
+    Prescription existingPrescription = existingPrescriptionOpt.get();
+    
+    //Incoming prescription
+    Prescription prescription = existingPrescription;
+    updatePrescriptionEntity(prescription, dto);
+    //convertToPrescriptionEntity(dto);
+    
     // debit stock
     for (PrescriptionLineItem prescriptionLineItem : prescription.getLineItems()) {
+      if(prescriptionLineItem.getStatus().equals("Dispensed")){
+        //skip lines that have succeeded before
+        continue;
+      }
       // Get SOH - call
       LotDto lot = lotReferenceDataService
           .findOne(prescriptionLineItem.getLotId());
+      
+      OrderableDto orderable = null;
+      if(null == prescriptionLineItem.getSubstituteOrderableId()){
+        orderable = orderableReferenceDataService
+          .findOne(prescriptionLineItem.getOrderableId());
+      } else {
+        orderable = orderableReferenceDataService
+          .findOne(prescriptionLineItem.getSubstituteOrderableId());
+      }
+      
+      UUID programId = orderable.getPrograms().stream().findFirst().get().getProgramId();
       List<StockCardSummaryDto> stockCardSummaries = stockCardSummariesStockManagementService
           .search(
-              prescriptionLineItem.getProgramId(),
+              programId,
               prescription.getFacilityId(),
-              Collections.singleton(prescriptionLineItem.getOrderableId()),
+              Collections.singleton(orderable.getId()),
               LocalDate.now(),
               lot.getLotCode());
 
@@ -139,10 +164,10 @@ public class PrescriptionService {
           // debit bulk orderable
           StockEventDto stockEventDebit = new StockEventDto();
           stockEventDebit.setFacilityId(prescription.getFacilityId());
-          stockEventDebit.setProgramId(prescriptionLineItem.getProgramId());
-          stockEventDebit.setUserId(prescription.getPrescribedByUserId());
+          stockEventDebit.setProgramId(programId);
+          stockEventDebit.setUserId(prescription.getServedByUserId());
           StockEventLineItemDto lineItemDebit = new StockEventLineItemDto(
-              prescriptionLineItem.getOrderableId(),
+              orderable.getId(),
               prescriptionLineItem.getLotId(),
               prescriptionLineItem.getQuantityDispensed(),
               LocalDate.now(),
@@ -152,11 +177,24 @@ public class PrescriptionService {
           LOGGER.error("Submitting stockevent DR : " + stockEventDebit.toString());
           stockEventStockManagementService.submit(stockEventDebit);
 
-          updatePrescriptionEntity(prescription, dto);
-          prescription = prescriptionRepository.save(prescription);
+          prescriptionLineItem.setStatus("Dispensed");
+          //prescription.setId(existingPrescription.get().getId());
+          
+        } else {
+          //Not enough stock for this line item
+          prescriptionLineItem.setStatus("Failure - inadequate stock");
         }
+      } else {
+        //the specified product (orderable or substitute) is not available at this facility
+        prescriptionLineItem.setStatus("Failure - product not found");
       }
     }
+
+    //if all lines are Dispensed or if not dispesnsed but served internal is false
+    // status = served
+    //else if any line is served internally, status = patially served
+    prescription.setStatus(PrescriptionStatus.SERVED);
+    prescription = prescriptionRepository.save(prescription);
 
     return prescriptionToDto(prescription);
   }
@@ -185,6 +223,7 @@ public class PrescriptionService {
   @Transactional
   public UUID createPrescription(PrescriptionDto prescriptionDto) {
     Prescription prescription = convertToPrescriptionEntity(prescriptionDto);
+    prescription.setStatus(PrescriptionStatus.INITIATED);
     return prescriptionRepository.save(prescription).getId();
   }
 
@@ -211,7 +250,7 @@ public class PrescriptionService {
       prescription.setCapturedDate(today);
       prescription.setLastUpdate(today);
       prescription.setIsVoided(prescriptionDto.getIsVoided());
-      prescription.setStatus(prescriptionDto.getStatus());
+      //prescription.setStatus(prescriptionDto.getStatus());
       prescription.setFacilityId(prescriptionDto.getFacilityId());
       prescription.setPrescribedByUserId(prescriptionDto.getPrescribedByUserId());
       prescription.setServedByUserId(prescriptionDto.getServedByUserId());
@@ -238,7 +277,7 @@ public class PrescriptionService {
     return new PrescriptionLineItem(lineItemDto.getDosage(), lineItemDto.getPeriod(),
         lineItemDto.getLotId(), lineItemDto.getQuantityPrescribed(), lineItemDto.getQuantityDispensed(),
         lineItemDto.getServedInternally(), lineItemDto.getOrderableId(), lineItemDto.getSubstituteOrderableId(),
-        lineItemDto.getComments(), lineItemDto.getProgramId(), prescription);
+        lineItemDto.getComments(), lineItemDto.getStatus(), prescription);
   }
 
   /**
@@ -258,7 +297,7 @@ public class PrescriptionService {
         .capturedDate(prescription.getCapturedDate())
         .lastUpdate(prescription.getLastUpdate())
         .isVoided(prescription.getIsVoided())
-        .status(prescription.getStatus())
+        //.status(prescription.getStatus())
         .facilityId(prescription.getFacilityId())
         .prescribedByUserId(prescription.getPrescribedByUserId())
         .lineItems(prescription.getLineItems() != null
@@ -291,6 +330,7 @@ public class PrescriptionService {
         .orderableId(lineItem.getOrderableId())
         .substituteOrderableId(lineItem.getSubstituteOrderableId())
         .comments(lineItem.getComments())
+        .status(lineItem.getStatus())
         .build();
   }
 
@@ -316,9 +356,9 @@ public class PrescriptionService {
     if (prescriptionDto.getIsVoided() != null) {
       prescription.setIsVoided(prescriptionDto.getIsVoided());
     }
-    if (prescriptionDto.getStatus() != null) {
-      prescription.setStatus(prescriptionDto.getStatus());
-    }
+    // if (prescriptionDto.getStatus() != null) {
+    //   prescription.setStatus(prescriptionDto.getStatus());
+    // }
     if (prescriptionDto.getFacilityId() != null) {
       prescription.setFacilityId(prescriptionDto.getFacilityId());
     }

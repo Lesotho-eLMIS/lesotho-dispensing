@@ -37,7 +37,8 @@ public class PrescriptionLineItemDto {
   private UUID orderableId;
   private UUID substituteOrderableId;
   private String comments;
-  private UUID programId;
+  private String status;
+  // private UUID programId;
 
   /**
    * Convert dto to jpa model.
@@ -49,6 +50,6 @@ public class PrescriptionLineItemDto {
     return new PrescriptionLineItem(
         dosage, period, lotId, quantityPrescribed,
         quantityDispensed, servedInternally, orderableId,
-        substituteOrderableId, comments, programId);
+        substituteOrderableId, comments, status);
   }
 }

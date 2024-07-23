@@ -15,7 +15,7 @@
 
 package org.openlmis.dispensing.domain.status;
 
-public enum DispensingEventStatus {
+public enum PrescriptionStatus {
   INITIATED,
   SERVED,
   PARTIALLY_SERVED,
