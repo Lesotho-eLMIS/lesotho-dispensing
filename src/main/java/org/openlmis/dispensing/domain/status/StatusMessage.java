@@ -33,7 +33,7 @@ import org.openlmis.dispensing.domain.BaseTimestampedEntity;
 import org.openlmis.dispensing.domain.prescription.Prescription;
 
 @Entity
-@Table(name = "status_messages", schema = "prepacking")
+@Table(name = "status_messages", schema = "dispensing")
 @NoArgsConstructor
 public class StatusMessage extends BaseTimestampedEntity {
 

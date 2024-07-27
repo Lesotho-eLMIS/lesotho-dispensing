@@ -15,10 +15,10 @@
 
 package org.openlmis.dispensing.domain.status;
 
-public enum PrescriptionStatus {
-  INITIATED,
+public enum PrescriptionLineItemStatus {
+  REQUESTED,
   FULLY_SERVED,
   PARTIALLY_SERVED,
-  RETURNED,
-  CANCELLED
+  INADEQUATE_STOCK,
+  PRODUCT_NOT_EXIST
 }

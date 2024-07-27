@@ -42,7 +42,7 @@ public class StatusChange extends BaseTimestampedEntity {
   @JoinColumn(name = "prescriptionId", nullable = false)
   @Getter
   @Setter
-  private Prescription dispensingEvent;
+  private Prescription prescription;
 
   @OneToOne(mappedBy = "statusChange")
   @Getter
@@ -69,15 +69,15 @@ public class StatusChange extends BaseTimestampedEntity {
   // @Setter
   // private List<Rejection> rejections = new ArrayList<>();
 
-  private StatusChange(Prescription dispensingEvent, UUID authorId) {
-    this.dispensingEvent = Objects.requireNonNull(dispensingEvent);
+  private StatusChange(Prescription prescription, UUID authorId) {
+    this.prescription = Objects.requireNonNull(prescription);
     this.authorId = authorId;
-    // this.supervisoryNodeId = dispensingEvent.getSupervisoryNodeId();
-    this.status = Objects.requireNonNull(dispensingEvent.getStatus());
+    // this.supervisoryNodeId = prescription.getSupervisoryNodeId();
+    this.status = Objects.requireNonNull(prescription.getStatus());
   }
 
-  public static StatusChange newStatusChange(Prescription dispensingEvent, UUID authorId) {
-    return new StatusChange(dispensingEvent, authorId);
+  public static StatusChange newStatusChange(Prescription prescription, UUID authorId) {
+    return new StatusChange(prescription, authorId);
   }
 
   /**

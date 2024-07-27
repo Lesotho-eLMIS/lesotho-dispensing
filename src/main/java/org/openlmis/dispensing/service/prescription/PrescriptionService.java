@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.openlmis.dispensing.domain.patient.Patient;
 import org.openlmis.dispensing.domain.prescription.Prescription;
 import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
+import org.openlmis.dispensing.domain.status.PrescriptionLineItemStatus;
 import org.openlmis.dispensing.domain.status.PrescriptionStatus;
 import org.openlmis.dispensing.dto.patient.PatientDto;
 import org.openlmis.dispensing.dto.prescription.PrescriptionDto;
@@ -130,7 +131,7 @@ public class PrescriptionService {
     
     // debit stock
     for (PrescriptionLineItem prescriptionLineItem : prescription.getLineItems()) {
-      if(prescriptionLineItem.getStatus().equals("Dispensed")){
+      if (prescriptionLineItem.getStatus().equals(PrescriptionLineItemStatus.FULLY_SERVED)) {
         //skip lines that have succeeded before
         continue;
       }
@@ -138,14 +139,8 @@ public class PrescriptionService {
       LotDto lot = lotReferenceDataService
           .findOne(prescriptionLineItem.getLotId());
       
-      OrderableDto orderable = null;
-      if(null == prescriptionLineItem.getSubstituteOrderableId()){
-        orderable = orderableReferenceDataService
-          .findOne(prescriptionLineItem.getOrderableId());
-      } else {
-        orderable = orderableReferenceDataService
-          .findOne(prescriptionLineItem.getSubstituteOrderableId());
-      }
+      OrderableDto orderable = orderableReferenceDataService
+          .findOne(prescriptionLineItem.getOrderableDispensed());
       
       UUID programId = orderable.getPrograms().stream().findFirst().get().getProgramId();
       List<StockCardSummaryDto> stockCardSummaries = stockCardSummariesStockManagementService
@@ -160,7 +155,7 @@ public class PrescriptionService {
         Integer stockOnHand = stockCardSummaries.get(0).getStockOnHand();
         if (prescriptionLineItem.getQuantityDispensed() <= stockOnHand) {
           LOGGER.info("We have enough stock for product "
-              + prescriptionLineItem.getOrderableId());
+              + orderable.getFullProductName());
           // debit bulk orderable
           StockEventDto stockEventDebit = new StockEventDto();
           stockEventDebit.setFacilityId(prescription.getFacilityId());
@@ -177,23 +172,50 @@ public class PrescriptionService {
           LOGGER.error("Submitting stockevent DR : " + stockEventDebit.toString());
           stockEventStockManagementService.submit(stockEventDebit);
 
-          prescriptionLineItem.setStatus("Dispensed");
-          //prescription.setId(existingPrescription.get().getId());
+          
+          if (prescriptionLineItem.getRemainingBalance() == 0) {
+            prescriptionLineItem.setRemainingBalance(prescriptionLineItem.getQuantityPrescribed());
+          }
+          prescriptionLineItem.setRemainingBalance(
+            prescriptionLineItem.getRemainingBalance()
+            - prescriptionLineItem.getQuantityDispensed()
+          );
+          
+          if (((prescriptionLineItem.getRemainingBalance() > 0) && (prescriptionLineItem.getServedExternally())) 
+              || (prescriptionLineItem.getRemainingBalance() == 0)) {
+              //don't create backorder - we are done
+              prescriptionLineItem.setStatus(PrescriptionLineItemStatus.FULLY_SERVED);
+          } else {
+              //create backorder
+              prescriptionLineItem.setStatus(PrescriptionLineItemStatus.PARTIALLY_SERVED);
+          }
           
         } else {
           //Not enough stock for this line item
-          prescriptionLineItem.setStatus("Failure - inadequate stock");
+          prescriptionLineItem.setStatus(PrescriptionLineItemStatus.INADEQUATE_STOCK);
         }
       } else {
         //the specified product (orderable or substitute) is not available at this facility
-        prescriptionLineItem.setStatus("Failure - product not found");
+        prescriptionLineItem.setStatus(PrescriptionLineItemStatus.PRODUCT_NOT_EXIST);
       }
     }
 
     //if all lines are Dispensed or if not dispesnsed but served internal is false
     // status = served
     //else if any line is served internally, status = patially served
-    prescription.setStatus(PrescriptionStatus.SERVED);
+    Boolean isFullyServed = true;
+    for (PrescriptionLineItem lineItem : prescription.getLineItems()) {
+      if (!lineItem.getStatus().equals(PrescriptionLineItemStatus.FULLY_SERVED)) {
+        isFullyServed = false;
+      }
+    }
+
+    if (isFullyServed) {
+      prescription.setStatus(PrescriptionStatus.FULLY_SERVED);
+    } else {
+      prescription.setStatus(PrescriptionStatus.PARTIALLY_SERVED);
+    }
+
     prescription = prescriptionRepository.save(prescription);
 
     return prescriptionToDto(prescription);
@@ -203,15 +225,22 @@ public class PrescriptionService {
    * Update a PrescriptionLineItem.
    */
   public void updateLineItemEntity(PrescriptionLineItem lineItem, PrescriptionLineItemDto lineItemDto) {
-    lineItem.setDosage(lineItemDto.getDosage());
-    lineItem.setPeriod(lineItemDto.getPeriod());
-    lineItem.setLotId(lineItemDto.getLotId());
+    lineItem.setDose(lineItemDto.getDose());
+    lineItem.setDoseUnits(lineItemDto.getDoseUnits());
+    lineItem.setDoseFrequency(lineItemDto.getDoseFrequency());
+    lineItem.setRoute(lineItemDto.getRoute());
+    lineItem.setDuration(lineItemDto.getDuration());
+    lineItem.setDurationUnits(lineItemDto.getDurationUnits());
+    lineItem.setAdditionalInstructions(lineItemDto.getAdditionalInstructions());
+    lineItem.setOrderablePrescribed(lineItemDto.getOrderablePrescribed());
     lineItem.setQuantityPrescribed(lineItemDto.getQuantityPrescribed());
+    lineItem.setOrderableDispensed(lineItemDto.getOrderableDispensed());
+    lineItem.setLotId(lineItemDto.getLotId());
     lineItem.setQuantityDispensed(lineItemDto.getQuantityDispensed());
-    lineItem.setServedInternally(lineItemDto.getServedInternally());
-    lineItem.setOrderableId(lineItemDto.getOrderableId());
-    lineItem.setSubstituteOrderableId(lineItemDto.getSubstituteOrderableId());
+    lineItem.setServedExternally(lineItemDto.getServedExternally());
     lineItem.setComments(lineItemDto.getComments());
+    lineItem.setRemainingBalance(lineItemDto.getRemainingBalance());
+    //lineItem.setStatus(PrescriptionLineItemStatus.valueOf(lineItemDto.getStatus()));
   }
 
   /**
@@ -269,16 +298,44 @@ public class PrescriptionService {
     return null;
   }
 
+  // private PrescriptionLineItem convertToPrescriptionLineItemEntity(PrescriptionLineItemDto lineItemDto,
+  //     Prescription prescription) {
+  //   if (lineItemDto == null) {
+  //     return null;
+  //   }
+  //   return new PrescriptionLineItem(lineItemDto.getDosage(), lineItemDto.getPeriod(),
+  //       lineItemDto.getLotId(), lineItemDto.getQuantityPrescribed(), lineItemDto.getQuantityDispensed(),
+  //       lineItemDto.getServedExternally(), lineItemDto.getOrderableId(), lineItemDto.getSubstituteOrderableId(),
+  //       lineItemDto.getComments(), lineItemDto.getStatus(), prescription);
+  // }
+
   private PrescriptionLineItem convertToPrescriptionLineItemEntity(PrescriptionLineItemDto lineItemDto,
-      Prescription prescription) {
+    Prescription prescription) {
     if (lineItemDto == null) {
       return null;
     }
-    return new PrescriptionLineItem(lineItemDto.getDosage(), lineItemDto.getPeriod(),
-        lineItemDto.getLotId(), lineItemDto.getQuantityPrescribed(), lineItemDto.getQuantityDispensed(),
-        lineItemDto.getServedInternally(), lineItemDto.getOrderableId(), lineItemDto.getSubstituteOrderableId(),
-        lineItemDto.getComments(), lineItemDto.getStatus(), prescription);
-  }
+    PrescriptionLineItem item = new PrescriptionLineItem(
+        lineItemDto.getDose(),
+        lineItemDto.getDoseUnits(),
+        lineItemDto.getDoseFrequency(),
+        lineItemDto.getRoute(),
+        lineItemDto.getDuration(),
+        lineItemDto.getDurationUnits(),
+        lineItemDto.getAdditionalInstructions(),
+        lineItemDto.getOrderablePrescribed(),
+        lineItemDto.getQuantityPrescribed(),
+        lineItemDto.getOrderableDispensed(),
+        lineItemDto.getLotId(),
+        lineItemDto.getQuantityDispensed(),
+        lineItemDto.getRemainingBalance(),
+        lineItemDto.getServedExternally(),
+        lineItemDto.getComments(),
+        lineItemDto.getCollectBalanceDate()
+    );
+    // item.setStatus(PrescriptionLineItemStatus.valueOf(lineItemDto.getStatus()));
+    item.setPrescription(prescription);
+    return item;
+}
 
   /**
    * Create dto from jpa model.
@@ -314,23 +371,28 @@ public class PrescriptionService {
    * @param lineItem PrescriptionLineItem entity.
    * @return PrescriptionLineItemDto.
    */
-  private PrescriptionLineItemDto lineItemToDto(PrescriptionLineItem lineItem) {
-    if (lineItem == null) {
+  private PrescriptionLineItemDto lineItemToDto(PrescriptionLineItem item) {
+    if (item == null) {
       return null;
     }
-
     return PrescriptionLineItemDto.builder()
-        .id(lineItem.getId())
-        .dosage(lineItem.getDosage())
-        .period(lineItem.getPeriod())
-        .lotId(lineItem.getLotId())
-        .quantityPrescribed(lineItem.getQuantityPrescribed())
-        .quantityDispensed(lineItem.getQuantityDispensed())
-        .servedInternally(lineItem.getServedInternally())
-        .orderableId(lineItem.getOrderableId())
-        .substituteOrderableId(lineItem.getSubstituteOrderableId())
-        .comments(lineItem.getComments())
-        .status(lineItem.getStatus())
+        .id(item.getId())
+        .dose(item.getDose())
+        .doseUnits(item.getDoseUnits())
+        .doseFrequency(item.getDoseFrequency())
+        .route(item.getRoute())
+        .duration(item.getDuration())
+        .durationUnits(item.getDurationUnits())
+        .additionalInstructions(item.getAdditionalInstructions())
+        .orderablePrescribed(item.getOrderablePrescribed())
+        .quantityPrescribed(item.getQuantityPrescribed())
+        //.status(item.getStatus())
+        .orderableDispensed(item.getOrderableDispensed())
+        .lotId(item.getLotId())
+        .quantityDispensed(item.getQuantityDispensed())
+        .servedExternally(item.getServedExternally())
+        .comments(item.getComments())
+        .remainingBalance(item.getRemainingBalance())
         .build();
   }
 
