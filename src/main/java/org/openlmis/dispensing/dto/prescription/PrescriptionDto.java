@@ -27,6 +27,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.patient.Contact;
 import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
+import org.openlmis.dispensing.domain.status.PrescriptionStatus;
 
 @Data
 @AllArgsConstructor
@@ -42,7 +43,8 @@ public class PrescriptionDto {
   private LocalDate capturedDate;
   private LocalDate lastUpdate;
   private Boolean isVoided;
-  private String status;
+  //private String status;
+  private PrescriptionStatus status;
   private UUID facilityId;
   private UUID prescribedByUserId;
   private UUID servedByUserId;

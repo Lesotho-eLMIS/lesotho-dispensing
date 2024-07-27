@@ -20,13 +20,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import org.openlmis.dispensing.domain.BaseEntity;
 import org.openlmis.dispensing.domain.status.PrescriptionLineItemStatus;
 
@@ -47,13 +53,18 @@ public class PrescriptionLineItem extends BaseEntity {
   private String additionalInstructions;    
   private UUID orderablePrescribed;
   private Integer quantityPrescribed;
+
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  @Getter
+  @Setter
   private PrescriptionLineItemStatus status = PrescriptionLineItemStatus.REQUESTED;
 
   //Prescription serve attributes
   private UUID orderableDispensed;
   private UUID lotId;
   private Integer quantityDispensed;
-  private Integer remainingBalance = 0;
+  private Integer remainingBalance;
   private Boolean servedExternally;
   private String comments;
   private LocalDate collectBalanceDate;

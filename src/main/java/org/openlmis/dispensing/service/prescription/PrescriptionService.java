@@ -252,7 +252,6 @@ public class PrescriptionService {
   @Transactional
   public UUID createPrescription(PrescriptionDto prescriptionDto) {
     Prescription prescription = convertToPrescriptionEntity(prescriptionDto);
-    prescription.setStatus(PrescriptionStatus.INITIATED);
     return prescriptionRepository.save(prescription).getId();
   }
 
@@ -279,7 +278,7 @@ public class PrescriptionService {
       prescription.setCapturedDate(today);
       prescription.setLastUpdate(today);
       prescription.setIsVoided(prescriptionDto.getIsVoided());
-      //prescription.setStatus(prescriptionDto.getStatus());
+      prescription.setStatus(prescriptionDto.getStatus());
       prescription.setFacilityId(prescriptionDto.getFacilityId());
       prescription.setPrescribedByUserId(prescriptionDto.getPrescribedByUserId());
       prescription.setServedByUserId(prescriptionDto.getServedByUserId());
@@ -436,6 +435,65 @@ public class PrescriptionService {
           .map(lineItemDto -> convertToPrescriptionLineItemEntity(lineItemDto, prescription))
           .collect(Collectors.toList()));
     }
+  }
+
+  private void updatePrescriptionLineItemEntity(PrescriptionLineItem prescriptionLineItem, 
+      PrescriptionLineItemDto prescriptionLineItemDto) {
+    if (prescriptionLineItem.getDose() != null) {
+      prescriptionLineItem.setDose(prescriptionLineItemDto.getDose());
+    }
+    if (prescriptionLineItem.getDoseUnits() != null) {
+      prescriptionLineItem.setDoseUnits(prescriptionLineItemDto.getDoseUnits());
+    }
+    if (prescriptionLineItem.getDoseFrequency() != null) {
+      prescriptionLineItem.setDoseFrequency(prescriptionLineItem.getDoseFrequency());
+    }
+    if (prescriptionLineItem.getRoute() != null) {
+      prescriptionLineItem.setRoute(prescriptionLineItemDto.getRoute());
+    }
+    if (prescriptionLineItem.getDuration() != null) {
+      prescriptionLineItem.setDuration(prescriptionLineItemDto.getDuration());
+    }
+    if (prescriptionLineItem.getDurationUnits() != null) {
+      prescriptionLineItem.setDurationUnits(prescriptionLineItemDto.getDurationUnits());
+    }
+    if (prescriptionLineItem.getDuration() != null) {
+      prescriptionLineItem.setDuration(prescriptionLineItemDto.getDuration());
+    }
+    if (prescriptionLineItem.getAdditionalInstructions() != null) {
+      prescriptionLineItem.setAdditionalInstructions(prescriptionLineItemDto.getAdditionalInstructions());
+    }
+    if (prescriptionLineItem.getOrderablePrescribed() != null) {
+      prescriptionLineItem.setOrderablePrescribed(prescriptionLineItemDto.getOrderableDispensed());
+    }
+    if (prescriptionLineItem.getQuantityPrescribed() != null) {
+      prescriptionLineItem.setQuantityDispensed(prescriptionLineItemDto.getQuantityDispensed());
+    }
+
+    if (prescriptionLineItem.getOrderableDispensed() != null) {
+      prescriptionLineItem.setOrderableDispensed(prescriptionLineItemDto.getOrderableDispensed());
+    }
+    if (prescriptionLineItem.getLotId() != null) {
+      prescriptionLineItem.setLotId(prescriptionLineItemDto.getLotId());
+    }
+    if (prescriptionLineItem.getAdditionalInstructions() != null) {
+      prescriptionLineItem.setAdditionalInstructions(prescriptionLineItemDto.getAdditionalInstructions());
+    }
+    if (prescriptionLineItem.getQuantityDispensed() != null) {
+      prescriptionLineItem.setQuantityDispensed(prescriptionLineItemDto.getQuantityDispensed());
+    }
+    if (prescriptionLineItem.getRemainingBalance() != null) {
+      prescriptionLineItem.setRemainingBalance(prescriptionLineItemDto.getRemainingBalance());
+    }
+    if (prescriptionLineItem.getServedExternally() != null) {
+      prescriptionLineItem.setServedExternally(prescriptionLineItemDto.getServedExternally());
+    }
+    if (prescriptionLineItem.getComments() != null) {
+      prescriptionLineItem.setComments(prescriptionLineItemDto.getComments());
+    }
+    if (prescriptionLineItem.getCollectBalanceDate() != null) {
+      prescriptionLineItem.setCollectBalanceDate(prescriptionLineItemDto.getCollectBalanceDate());
+    } 
   }
 
   /**
