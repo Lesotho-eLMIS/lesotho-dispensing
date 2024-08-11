@@ -20,16 +20,23 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import org.openlmis.dispensing.domain.BaseEntity;
 import org.openlmis.dispensing.domain.patient.Patient;
+import org.openlmis.dispensing.domain.status.PrescriptionStatus;
 
 
 @Entity
@@ -45,13 +52,19 @@ public class Prescription extends BaseEntity {
   private LocalDate capturedDate;
   private LocalDate lastUpdate;
   private Boolean isVoided;
-  private String status;
   private UUID facilityId;
-  private UUID userId;
+  private UUID prescribedByUserId;
+  private UUID servedByUserId;
   @ManyToOne
   @JoinColumn(name = "patient_id")
   private Patient patient;
 
   @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<PrescriptionLineItem> lineItems;
+
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  @Getter
+  @Setter
+  private PrescriptionStatus status;
 }

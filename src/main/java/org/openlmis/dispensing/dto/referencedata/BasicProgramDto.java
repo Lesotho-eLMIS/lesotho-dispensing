@@ -13,30 +13,23 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.domain;
+package org.openlmis.dispensing.dto.referencedata;
 
-import java.util.UUID;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 
-@MappedSuperclass
-public abstract class BaseEntity {
-  protected static final String TEXT_COLUMN_DEFINITION = "text";
-  protected static final String PG_UUID = "pg-uuid";
-  protected static final String UUID_TYPE = "pg-uuid";
+import org.openlmis.dispensing.dto.BaseDto;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class BasicProgramDto extends BaseDto {
+  private String code;
+  private String name;
 
-  @Id
-  @GeneratedValue(generator = "uuid-gen")
-  @GenericGenerator(name = "uuid-gen",
-      strategy = "org.openlmis.dispensing.util.ConditionalUuidGenerator")
-  @Type(type = PG_UUID)
-  @Getter
-  @Setter
-  protected UUID id;
 }

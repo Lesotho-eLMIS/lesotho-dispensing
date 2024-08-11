@@ -13,30 +13,23 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.domain;
+package org.openlmis.dispensing.service.stockmanagement;
 
-import java.util.UUID;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import org.openlmis.dispensing.service.BaseCommunicationService;
+import org.springframework.beans.factory.annotation.Value;
 
-@MappedSuperclass
-public abstract class BaseEntity {
-  protected static final String TEXT_COLUMN_DEFINITION = "text";
-  protected static final String PG_UUID = "pg-uuid";
-  protected static final String UUID_TYPE = "pg-uuid";
+public abstract class BaseStockManagementService<T> extends BaseCommunicationService<T> {
 
+  @Value("${stockmanagement.url}")
+  private String stockmanagementUrl;
 
-  @Id
-  @GeneratedValue(generator = "uuid-gen")
-  @GenericGenerator(name = "uuid-gen",
-      strategy = "org.openlmis.dispensing.util.ConditionalUuidGenerator")
-  @Type(type = PG_UUID)
-  @Getter
-  @Setter
-  protected UUID id;
+  protected String getServiceName() {
+    return "Stock Management";
+  }
+
+  @Override
+  protected String getServiceUrl() {
+    return stockmanagementUrl;
+  }
+
 }

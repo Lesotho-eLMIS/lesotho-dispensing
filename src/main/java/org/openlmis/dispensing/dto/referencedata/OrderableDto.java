@@ -13,30 +13,38 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.domain;
+package org.openlmis.dispensing.dto.referencedata;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import lombok.ToString;
 
-@MappedSuperclass
-public abstract class BaseEntity {
-  protected static final String TEXT_COLUMN_DEFINITION = "text";
-  protected static final String PG_UUID = "pg-uuid";
-  protected static final String UUID_TYPE = "pg-uuid";
-
-
-  @Id
-  @GeneratedValue(generator = "uuid-gen")
-  @GenericGenerator(name = "uuid-gen",
-      strategy = "org.openlmis.dispensing.util.ConditionalUuidGenerator")
-  @Type(type = PG_UUID)
-  @Getter
-  @Setter
-  protected UUID id;
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+public class OrderableDto {
+  private UUID id;
+  private String productCode;
+  private String fullProductName;
+  private String description;
+  private Long netContent;
+  private Integer packRoundingThreshold;
+  private Boolean roundToZero;
+  private Set<ProgramOrderableDto> programs;
+  private DispensableDto dispensable;
+  private Set<OrderableChildDto> children;
+  private Map<String, String> identifiers;
+  private Map<String, String> extraData;
+  private MetaDataDto meta = new MetaDataDto();
 }

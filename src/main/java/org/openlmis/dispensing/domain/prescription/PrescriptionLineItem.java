@@ -17,16 +17,24 @@ package org.openlmis.dispensing.domain.prescription;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import org.openlmis.dispensing.domain.BaseEntity;
+import org.openlmis.dispensing.domain.status.PrescriptionLineItemStatus;
 
 @Entity
 @Data
@@ -34,15 +42,33 @@ import org.openlmis.dispensing.domain.BaseEntity;
 @AllArgsConstructor
 @Table(name = "PrescriptionLineItem", schema = "dispensing")
 public class PrescriptionLineItem extends BaseEntity {
-  private String dosage;
-  private Integer period;
-  private UUID lotId;
+  
+  //Prescription create attributes
+  private Integer dose;
+  private String doseUnits;
+  private String doseFrequency;
+  private String route;
+  private Integer duration;
+  private String durationUnits;
+  private String additionalInstructions;    
+  private UUID orderablePrescribed;
   private Integer quantityPrescribed;
+
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  @Getter
+  @Setter
+  private PrescriptionLineItemStatus status = PrescriptionLineItemStatus.REQUESTED;
+
+  //Prescription serve attributes
+  private UUID orderableDispensed;
+  private UUID lotId;
   private Integer quantityDispensed;
-  private Boolean servedInternally;
-  private UUID orderableId;
-  private UUID substituteOrderableId;
+  private Integer remainingBalance;
+  private Boolean servedExternally;
   private String comments;
+  private LocalDate collectBalanceDate;
+  //private UUID programId;
 
   @JsonIgnore
   @ManyToOne
@@ -52,18 +78,30 @@ public class PrescriptionLineItem extends BaseEntity {
   /**
    * Constructor for PrescriptionLineItem.
    */
-  public PrescriptionLineItem(String dosage, Integer period, UUID lotId,
-      Integer quantityDispensed, Integer quantityPrescribed,
-      Boolean servedInternally, UUID orderableId, UUID substituteOrderableId,
-      String comments) {
-    this.dosage = dosage;
-    this.lotId = lotId;
-    this.period = period;
+  public PrescriptionLineItem(Integer dose, String doseUnits, String doseFrequency, String route,
+      Integer duration, String durationUnits, String additionalInstructions, UUID orderablePrescribed,
+      Integer quantityPrescribed, UUID orderableDispensed, UUID lotId, Integer quantityDispensed,
+      Integer remainingBalance, Boolean servedExternally, String comments, LocalDate collectBalanceDate) {
+    
+    // Prescription create attributes
+    this.dose = dose;
+    this.doseUnits = doseUnits;
+    this.doseFrequency = doseFrequency;
+    this.route = route;
+    this.duration = duration;
+    this.durationUnits = durationUnits;
+    this.additionalInstructions = additionalInstructions;
+    this.orderablePrescribed = orderablePrescribed;
     this.quantityPrescribed = quantityPrescribed;
+    this.status = PrescriptionLineItemStatus.REQUESTED;  // Set default value
+
+    // Prescription serve attributes
+    this.orderableDispensed = orderableDispensed;
+    this.lotId = lotId;
     this.quantityDispensed = quantityDispensed;
-    this.servedInternally = servedInternally;
-    this.orderableId = orderableId;
-    this.substituteOrderableId = substituteOrderableId;
+    this.remainingBalance = remainingBalance;
+    this.servedExternally = servedExternally;
     this.comments = comments;
+    this.collectBalanceDate = collectBalanceDate;
   }
 }

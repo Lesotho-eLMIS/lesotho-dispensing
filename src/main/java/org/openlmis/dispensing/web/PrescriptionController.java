@@ -16,6 +16,7 @@
 package org.openlmis.dispensing.web;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.flywaydb.core.internal.util.StringUtils;
+import org.openlmis.dispensing.domain.status.PrescriptionStatus;
 import org.openlmis.dispensing.dto.prescription.PrescriptionDto;
 import org.openlmis.dispensing.service.prescription.PrescriptionService;
 import org.slf4j.Logger;
@@ -62,7 +64,8 @@ public class PrescriptionController extends BaseController {
    */
   @Transactional
   @RequestMapping(method = POST)
-  public ResponseEntity<UUID> createPrescription(@org.springframework.web.bind.annotation.RequestBody PrescriptionDto prescriptionDto) {
+  public ResponseEntity<UUID> createPrescription(
+      @org.springframework.web.bind.annotation.RequestBody PrescriptionDto prescriptionDto) {
     LOGGER.debug("Try to create a prescription");
     Profiler profiler = getProfiler("CREATE_PRESCRIPTION", prescriptionDto);
 
@@ -75,7 +78,6 @@ public class PrescriptionController extends BaseController {
     return stopProfiler(profiler, response);
   }
 
-
   /**
    * Get prescription with a given id (uuid).
    * A prescriptions matching the given id.
@@ -85,6 +87,9 @@ public class PrescriptionController extends BaseController {
   @ResponseBody
   public ResponseEntity<PrescriptionDto> getPrescription(@PathVariable UUID id) {
     PrescriptionDto prescription = prescriptionService.getPrescriptionById(id);
+    if (null == prescription) {
+      return new ResponseEntity<>(NOT_FOUND);
+    }
     return new ResponseEntity<>(prescription, OK);
   }
 
@@ -102,6 +107,22 @@ public class PrescriptionController extends BaseController {
   public ResponseEntity<PrescriptionDto> updatePrescription(@PathVariable UUID id, @RequestBody PrescriptionDto dto) {
     PrescriptionDto updatedPrescription = prescriptionService.updatePrescription(id, dto);
     return new ResponseEntity<>(updatedPrescription, OK);
+  }
+
+  /**
+   * Serve a Prescription.
+   *
+   * @param id  Prescription id.
+   * @param dto Prescription dto.
+   * @return Updated Prescription dto.
+   */
+  @Transactional
+  @RequestMapping(value = "/{id}/serve", method = POST)
+  @ResponseStatus(OK)
+  @ResponseBody
+  public ResponseEntity<PrescriptionDto> servePrescription(@PathVariable UUID id, @RequestBody PrescriptionDto dto) {
+    PrescriptionDto servedPrescription = prescriptionService.servePrescription(id, dto);
+    return new ResponseEntity<>(servedPrescription, OK);
   }
 
   /**
@@ -126,7 +147,7 @@ public class PrescriptionController extends BaseController {
   @GetMapping
   @ResponseStatus
   @ResponseBody
-  //  @RequestMapping(value = "/prescriptions", method = RequestMethod.GET)
+  // @RequestMapping(value = "/prescriptions", method = RequestMethod.GET)
   public ResponseEntity<List<PrescriptionDto>> searchPrescriptions(
       @RequestParam(required = false) String patientNumber,
       @RequestParam(required = false) String firstName,
@@ -142,15 +163,22 @@ public class PrescriptionController extends BaseController {
     // Convert facilityId to UUID if not null or empty
     UUID facilityUuid = StringUtils.hasText(facilityId) ? UUID.fromString(facilityId) : null;
 
+    // Convert the status string to the corresponding enum
+    PrescriptionStatus prescriptionStatus;
+    try {
+      prescriptionStatus = status != null ? PrescriptionStatus.valueOf(status.toUpperCase()) : null;
+    } catch (IllegalArgumentException e) {
+      throw e;
+      //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status value: " + status + e.getLocalizedMessage());
+    }
+
     // Call the service method to search for prescriptions
     List<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptions(
         patientNumber, firstName, lastName, dateOfBirth, facilityUuid, nationalId,
-        status, patientType, isVoided, followUpDate);
+        prescriptionStatus, patientType, isVoided, followUpDate);
 
     // Return the response entity with the list of PrescriptionDto
     return ResponseEntity.ok(prescriptionDtos);
   }
-
-
 
 }

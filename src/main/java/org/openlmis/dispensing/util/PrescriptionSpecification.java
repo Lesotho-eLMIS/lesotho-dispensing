@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.openlmis.dispensing.domain.prescription.Prescription;
+import org.openlmis.dispensing.domain.status.PrescriptionStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 public class PrescriptionSpecification {
@@ -28,6 +29,10 @@ public class PrescriptionSpecification {
   }
 
   public static Specification<Prescription> statusEquals(String status) {
+    return (root, query, cb) -> status == null ? null : cb.equal(root.get("status"), status);
+  }
+
+  public static Specification<Prescription> statusEquals(PrescriptionStatus status) {
     return (root, query, cb) -> status == null ? null : cb.equal(root.get("status"), status);
   }
 

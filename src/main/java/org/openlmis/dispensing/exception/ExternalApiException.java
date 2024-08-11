@@ -13,30 +13,27 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.domain;
+package org.openlmis.dispensing.exception;
 
-import java.util.UUID;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import org.openlmis.dispensing.dto.LocalizedMessageDto;
 
-@MappedSuperclass
-public abstract class BaseEntity {
-  protected static final String TEXT_COLUMN_DEFINITION = "text";
-  protected static final String PG_UUID = "pg-uuid";
-  protected static final String UUID_TYPE = "pg-uuid";
+public class ExternalApiException extends RuntimeException {
 
+  private final LocalizedMessageDto localizedMessage;
 
-  @Id
-  @GeneratedValue(generator = "uuid-gen")
-  @GenericGenerator(name = "uuid-gen",
-      strategy = "org.openlmis.dispensing.util.ConditionalUuidGenerator")
-  @Type(type = PG_UUID)
-  @Getter
-  @Setter
-  protected UUID id;
+  public ExternalApiException(Throwable cause,
+      LocalizedMessageDto localizedMessage) {
+    super(cause);
+    this.localizedMessage = localizedMessage;
+  }
+
+  @Override
+  public String getMessage() {
+    return localizedMessage.toString();
+  }
+
+  public LocalizedMessageDto getMessageLocalized() {
+    return localizedMessage;
+  }
+
 }

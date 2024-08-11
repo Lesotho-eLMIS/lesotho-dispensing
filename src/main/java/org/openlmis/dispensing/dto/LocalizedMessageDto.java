@@ -13,12 +13,20 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.domain.status;
+package org.openlmis.dispensing.dto;
 
-public enum DispensingEventStatus {
-  INITIATED,
-  SERVED,
-  PARTIALLY_SERVED,
-  RETURNED,
-  CANCELLED
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class LocalizedMessageDto {
+  private String messageKey;
+  private String message;
 }

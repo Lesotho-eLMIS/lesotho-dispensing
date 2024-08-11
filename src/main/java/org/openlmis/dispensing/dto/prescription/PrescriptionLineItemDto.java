@@ -15,12 +15,14 @@
 
 package org.openlmis.dispensing.dto.prescription;
 
+import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
+import org.openlmis.dispensing.domain.status.PrescriptionLineItemStatus;
 
 @Data
 @AllArgsConstructor
@@ -28,26 +30,65 @@ import org.openlmis.dispensing.domain.prescription.PrescriptionLineItem;
 @Builder
 public class PrescriptionLineItemDto {
   private UUID id;
-  private String dosage;
-  private Integer period;
-  private UUID lotId;
+  private Integer dose;
+  private String doseUnits;
+  private String doseFrequency;
+  private String route;
+  private Integer duration;
+  private String durationUnits;
+  private String additionalInstructions;
+  private UUID orderablePrescribed;
   private Integer quantityPrescribed;
+  private PrescriptionLineItemStatus status;
+  
+  private UUID orderableDispensed;
+  private UUID lotId;
   private Integer quantityDispensed;
-  private Boolean servedInternally;
-  private UUID orderableId;
-  private UUID substituteOrderableId;
+  private Integer remainingBalance;
+  private Boolean servedExternally;
   private String comments;
+  private LocalDate collectBalanceDate;
 
   /**
    * Convert dto to jpa model.
    *
    * @return the converted jpa model object.
    */
-
   public PrescriptionLineItem toPrescriptionLineItem() {
     return new PrescriptionLineItem(
-        dosage, period, lotId, quantityPrescribed,
-        quantityDispensed, servedInternally, orderableId,
-        substituteOrderableId, comments);
+        dose, doseUnits, doseFrequency, route, duration, durationUnits,
+        additionalInstructions, orderablePrescribed, quantityPrescribed,
+        orderableDispensed, lotId, quantityDispensed, remainingBalance, servedExternally,
+        comments, collectBalanceDate
+    );
+  }
+
+  /**
+   * Convert jpa model to dto.
+   *
+   * @param item the jpa model object.
+   * @return the converted dto object.
+   */
+  public static PrescriptionLineItemDto fromPrescriptionLineItem(PrescriptionLineItem item) {
+    return PrescriptionLineItemDto.builder()
+        .id(item.getId())
+        .dose(item.getDose())
+        .doseUnits(item.getDoseUnits())
+        .doseFrequency(item.getDoseFrequency())
+        .route(item.getRoute())
+        .duration(item.getDuration())
+        .durationUnits(item.getDurationUnits())
+        .additionalInstructions(item.getAdditionalInstructions())
+        .orderablePrescribed(item.getOrderablePrescribed())
+        .quantityPrescribed(item.getQuantityPrescribed())
+        //.status(item.getStatus())
+        .orderableDispensed(item.getOrderableDispensed())
+        .lotId(item.getLotId())
+        .quantityDispensed(item.getQuantityDispensed())
+        .remainingBalance(item.getRemainingBalance())
+        .servedExternally(item.getServedExternally())
+        .comments(item.getComments())
+        .collectBalanceDate(item.getCollectBalanceDate())
+        .build();
   }
 }

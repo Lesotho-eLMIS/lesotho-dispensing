@@ -15,28 +15,32 @@
 
 package org.openlmis.dispensing.domain;
 
-import java.util.UUID;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonView;
+import java.time.ZonedDateTime;
+import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
+import org.openlmis.util.View;
 
 @MappedSuperclass
-public abstract class BaseEntity {
-  protected static final String TEXT_COLUMN_DEFINITION = "text";
-  protected static final String PG_UUID = "pg-uuid";
-  protected static final String UUID_TYPE = "pg-uuid";
+public abstract class BaseTimestampedEntity extends BaseEntity {
 
-
-  @Id
-  @GeneratedValue(generator = "uuid-gen")
-  @GenericGenerator(name = "uuid-gen",
-      strategy = "org.openlmis.dispensing.util.ConditionalUuidGenerator")
-  @Type(type = PG_UUID)
+  @Column(columnDefinition = "timestamp with time zone")
+  @JsonView(View.BasicInformation.class)
   @Getter
   @Setter
-  protected UUID id;
+  private ZonedDateTime createdDate;
+
+  @Column(columnDefinition = "timestamp with time zone")
+  @JsonView(View.BasicInformation.class)
+  @Getter
+  @Setter
+  private ZonedDateTime modifiedDate;
+
+  @PrePersist
+  private void prePersist() {
+    this.createdDate = ZonedDateTime.now();
+  }
 }

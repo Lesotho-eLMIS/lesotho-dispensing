@@ -420,4 +420,38 @@ traits:
             description: User does not have permission to save a prescription.
             body:
               application/json:
-                schema: localizedMessage    
+                schema: localizedMessage
+
+    /{id}/serve:
+      uriParameters:
+        id:
+          displayName: id
+          type: string
+          required: true
+          repeat: false
+      post:
+        is: [ secured ]
+        description: Serve a prescription.
+        body:
+          application/json:
+            schema: pointOfDeliveryEventDto
+
+        responses:
+          200:
+            description: Prescription served.
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: pointOfDeliveryEventDto
+          400:
+            body:
+              application/json:
+                schema: localizedMessage
+            description: An error occured during request processing.
+
+          403:
+            description: User does not have permission to serve a prescription.
+            body:
+              application/json:
+                schema: localizedMessage  
