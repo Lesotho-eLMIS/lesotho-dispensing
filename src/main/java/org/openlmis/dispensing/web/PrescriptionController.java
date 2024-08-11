@@ -16,6 +16,7 @@
 package org.openlmis.dispensing.web;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -85,6 +86,9 @@ public class PrescriptionController extends BaseController {
   @ResponseBody
   public ResponseEntity<PrescriptionDto> getPrescription(@PathVariable UUID id) {
     PrescriptionDto prescription = prescriptionService.getPrescriptionById(id);
+    if (null == prescription) {
+      return new ResponseEntity<>(NOT_FOUND);
+    }
     return new ResponseEntity<>(prescription, OK);
   }
 

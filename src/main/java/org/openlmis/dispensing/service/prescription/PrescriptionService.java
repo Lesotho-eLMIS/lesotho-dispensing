@@ -173,21 +173,23 @@ public class PrescriptionService {
           stockEventStockManagementService.submit(stockEventDebit);
 
           
-          if (prescriptionLineItem.getRemainingBalance() == 0) {
-            prescriptionLineItem.setRemainingBalance(prescriptionLineItem.getQuantityPrescribed());
-          }
-          prescriptionLineItem.setRemainingBalance(
-            prescriptionLineItem.getRemainingBalance()
-            - prescriptionLineItem.getQuantityDispensed()
-          );
+          // if (prescriptionLineItem.getRemainingBalance() == 0) {
+          //   prescriptionLineItem.setRemainingBalance(prescriptionLineItem.getQuantityPrescribed());
+          // }
+          // Integer balanceBeforeServe = existingPrescription.getLineItems().get(position).getRemainingBalance();
+          // prescriptionLineItem.setRemainingBalance(
+          //   balanceBeforeServe - prescriptionLineItem.getQuantityDispensed()
+          // );
+
+          // All these will be computed by UI
           
           if (((prescriptionLineItem.getRemainingBalance() > 0) && (prescriptionLineItem.getServedExternally())) 
               || (prescriptionLineItem.getRemainingBalance() == 0)) {
-              //don't create backorder - we are done
-              prescriptionLineItem.setStatus(PrescriptionLineItemStatus.FULLY_SERVED);
+            //don't create backorder - we are done
+            prescriptionLineItem.setStatus(PrescriptionLineItemStatus.FULLY_SERVED);
           } else {
-              //create backorder
-              prescriptionLineItem.setStatus(PrescriptionLineItemStatus.PARTIALLY_SERVED);
+            //create backorder
+            prescriptionLineItem.setStatus(PrescriptionLineItemStatus.PARTIALLY_SERVED);
           }
           
         } else {
@@ -309,7 +311,7 @@ public class PrescriptionService {
   // }
 
   private PrescriptionLineItem convertToPrescriptionLineItemEntity(PrescriptionLineItemDto lineItemDto,
-    Prescription prescription) {
+      Prescription prescription) {
     if (lineItemDto == null) {
       return null;
     }
@@ -334,7 +336,7 @@ public class PrescriptionService {
     // item.setStatus(PrescriptionLineItemStatus.valueOf(lineItemDto.getStatus()));
     item.setPrescription(prescription);
     return item;
-}
+  }
 
   /**
    * Create dto from jpa model.
@@ -353,9 +355,10 @@ public class PrescriptionService {
         .capturedDate(prescription.getCapturedDate())
         .lastUpdate(prescription.getLastUpdate())
         .isVoided(prescription.getIsVoided())
-        //.status(prescription.getStatus())
+        .status(prescription.getStatus())
         .facilityId(prescription.getFacilityId())
         .prescribedByUserId(prescription.getPrescribedByUserId())
+        .servedByUserId(prescription.getServedByUserId())
         .lineItems(prescription.getLineItems() != null
             ? prescription.getLineItems().stream()
                 .map(this::lineItemToDto)
@@ -385,7 +388,7 @@ public class PrescriptionService {
         .additionalInstructions(item.getAdditionalInstructions())
         .orderablePrescribed(item.getOrderablePrescribed())
         .quantityPrescribed(item.getQuantityPrescribed())
-        //.status(item.getStatus())
+        .status(item.getStatus())
         .orderableDispensed(item.getOrderableDispensed())
         .lotId(item.getLotId())
         .quantityDispensed(item.getQuantityDispensed())
@@ -417,9 +420,9 @@ public class PrescriptionService {
     if (prescriptionDto.getIsVoided() != null) {
       prescription.setIsVoided(prescriptionDto.getIsVoided());
     }
-    // if (prescriptionDto.getStatus() != null) {
-    //   prescription.setStatus(prescriptionDto.getStatus());
-    // }
+    if (prescriptionDto.getStatus() != null) {
+      prescription.setStatus(prescriptionDto.getStatus());
+    }
     if (prescriptionDto.getFacilityId() != null) {
       prescription.setFacilityId(prescriptionDto.getFacilityId());
     }
