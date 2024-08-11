@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.flywaydb.core.internal.util.StringUtils;
+import org.openlmis.dispensing.domain.status.PrescriptionStatus;
 import org.openlmis.dispensing.dto.prescription.PrescriptionDto;
 import org.openlmis.dispensing.service.prescription.PrescriptionService;
 import org.slf4j.Logger;
@@ -162,10 +163,19 @@ public class PrescriptionController extends BaseController {
     // Convert facilityId to UUID if not null or empty
     UUID facilityUuid = StringUtils.hasText(facilityId) ? UUID.fromString(facilityId) : null;
 
+    // Convert the status string to the corresponding enum
+    PrescriptionStatus prescriptionStatus;
+    try {
+      prescriptionStatus = status != null ? PrescriptionStatus.valueOf(status.toUpperCase()) : null;
+    } catch (IllegalArgumentException e) {
+      throw e;
+      //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status value: " + status + e.getLocalizedMessage());
+    }
+
     // Call the service method to search for prescriptions
     List<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptions(
         patientNumber, firstName, lastName, dateOfBirth, facilityUuid, nationalId,
-        status, patientType, isVoided, followUpDate);
+        prescriptionStatus, patientType, isVoided, followUpDate);
 
     // Return the response entity with the list of PrescriptionDto
     return ResponseEntity.ok(prescriptionDtos);
