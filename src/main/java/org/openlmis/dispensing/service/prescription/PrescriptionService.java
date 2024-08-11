@@ -581,9 +581,6 @@ public class PrescriptionService {
     List<Prescription> prescriptions = prescriptionRepository.findAll(spec);
 
     // Convert Prescription entities to PrescriptionDto objects
-    // return prescriptions.stream()
-    // .map(this::prescriptionToDto)
-    // .collect(Collectors.toList());
     return prescriptions == null ? new ArrayList<PrescriptionDto>()
         : prescriptions.stream()
             .map(this::prescriptionToDto)

@@ -1,55 +1,59 @@
 {
   "type": "object",
   "$schema": "http://json-schema.org/draft-04/schema",
-  "description": "Point of delivery event",
+  "description": "Prescription",
   "properties": {
-    "sourceId": {
+    "id": {
       "type": "string",
-      "description": "Indicates where orderables are received from. Can not be present along with destination id."
+      "format": "uuid"
     },
-    "sourceFreeText": {
+    "patientId": {
       "type": "string",
-      "description": "Remark of the source. Only allowed when source id is present and source id does not point to a facility in ref-data."
+      "format": "uuid"
     },
-    "destinationId": {
+    "patientType": {
+      "type": "string"
+    },
+    "followUpDate": {
       "type": "string",
-      "description": "During the 'ISSUE' event, destinationId indicates where orderables are issued to. Can not be present along with source id."
+      "format": "date"
     },
-    "destinationFreeText": {
+    "issueDate": {
       "type": "string",
-      "description": "Remark of the destination. Only allowed when destination id is present and destination id does not point to a facility in ref-data."
+      "format": "date"
     },
-    "referenceNumber": {
+    "createdDate": {
       "type": "string",
-      "description": "Reference number of the consignment/shipment."
+      "format": "date"
     },
-    "packingDate": {
+    "capturedDate": {
       "type": "string",
-      "format": "date",
-      "description": "The date when this event occurred"
+      "format": "date"
     },
-    "packedBy": {
+    "lastUpdate": {
       "type": "string",
-      "format": "date",
-      "description": "Person who packed consignment"
+      "format": "date"
     },
-    "numberOfCartons": {
-      "type": "integer",
-      "description": "Indicates quantity of cartons. Not allowed to be negative"
+    "isVoided": {
+      "type": "boolean"
     },
-    "numberOfContainers": {
-      "type": "integer",
-      "description": "Indicates quantity of containers. Not allowed to be negative"
+    "status": {
+      "type": "string"
     },
-    "remarks": {
+    "facilityId": {
       "type": "string",
-      "description": "Remarks for point of delivery event."
+      "format": "uuid"
+    },
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "lineItems": {
+      "type": "array",
+      "items": {
+        "$ref": "prescriptionLineItemDto.json"
+      }
     }
   },
-  "required": [
-    "sourceId",
-    "destinationId",
-    "numberOfCartons",
-    "numberOfContainers"
-  ]
+  "required": ["id", "patientId", "issueDate", "createdDate", "facilityId", "userId"]
 }
