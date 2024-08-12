@@ -49,6 +49,11 @@ public class PrescriptionLineItemDto {
   private String comments;
   private LocalDate collectBalanceDate;
 
+  // asked to resolve by UI - to remove
+  private String orderablePrescribedName;
+  private String orderableDispensedName;
+  private String lotCode;
+
   /**
    * Convert dto to jpa model.
    *

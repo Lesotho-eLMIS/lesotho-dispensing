@@ -50,6 +50,12 @@ public class PrescriptionDto {
   private UUID servedByUserId;
   private List<PrescriptionLineItemDto> lineItems;
 
+  //additional fields - ui asked that we resolve these - to remove
+  private String patientFirstName;
+  private String patientLastName;
+  private String patientNumber;
+  private String facilityName;
+
 
 
   /**

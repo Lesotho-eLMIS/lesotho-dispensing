@@ -30,6 +30,7 @@ import org.openlmis.dispensing.domain.status.PrescriptionStatus;
 import org.openlmis.dispensing.dto.patient.PatientDto;
 import org.openlmis.dispensing.dto.prescription.PrescriptionDto;
 import org.openlmis.dispensing.dto.prescription.PrescriptionLineItemDto;
+import org.openlmis.dispensing.dto.referencedata.FacilityDto;
 import org.openlmis.dispensing.dto.referencedata.LotDto;
 import org.openlmis.dispensing.dto.referencedata.OrderableDto;
 import org.openlmis.dispensing.dto.stockmanagement.StockCardSummaryDto;
@@ -39,6 +40,7 @@ import org.openlmis.dispensing.exception.ResourceNotFoundException;
 import org.openlmis.dispensing.repository.patient.PatientRepository;
 import org.openlmis.dispensing.repository.prescription.PrescriptionRepository;
 import org.openlmis.dispensing.service.patient.PatientService;
+import org.openlmis.dispensing.service.referencedata.FacilityReferenceDataService;
 import org.openlmis.dispensing.service.referencedata.LotReferenceDataService;
 import org.openlmis.dispensing.service.referencedata.OrderableReferenceDataService;
 import org.openlmis.dispensing.service.stockmanagement.StockCardSummariesStockManagementService;
@@ -66,6 +68,9 @@ public class PrescriptionService {
 
   @Autowired
   private LotReferenceDataService lotReferenceDataService;
+
+  @Autowired
+  private FacilityReferenceDataService facilityReferenceDataService;
 
   @Autowired
   private StockCardSummariesStockManagementService stockCardSummariesStockManagementService;
@@ -345,9 +350,13 @@ public class PrescriptionService {
    * @return Prescription created dto.
    */
   private PrescriptionDto prescriptionToDto(Prescription prescription) {
+    FacilityDto facility = facilityReferenceDataService.findOne(prescription.getFacilityId());
     return PrescriptionDto.builder()
         .id(prescription.getId())
         .patientId(prescription.getPatient().getId())
+        .patientFirstName(prescription.getPatient().getPerson().getFirstName())
+        .patientLastName(prescription.getPatient().getPerson().getLastName())
+        .patientNumber(prescription.getPatient().getPatientNumber())
         .patientType(prescription.getPatientType())
         .followUpDate(prescription.getFollowUpDate())
         .issueDate(prescription.getIssueDate())
@@ -357,6 +366,7 @@ public class PrescriptionService {
         .isVoided(prescription.getIsVoided())
         .status(prescription.getStatus())
         .facilityId(prescription.getFacilityId())
+        .facilityName(facility != null ? facility.getName() : null)
         .prescribedByUserId(prescription.getPrescribedByUserId())
         .servedByUserId(prescription.getServedByUserId())
         .lineItems(prescription.getLineItems() != null
@@ -377,6 +387,20 @@ public class PrescriptionService {
     if (item == null) {
       return null;
     }
+    OrderableDto dispensedOrderable = null;
+    OrderableDto prescribedOrderable = null;
+    LotDto lot = null;
+
+    if (item.getOrderablePrescribed() != null) {
+      prescribedOrderable = orderableReferenceDataService.findOne(item.getOrderablePrescribed());
+    }
+    if (item.getOrderableDispensed() != null) {
+      dispensedOrderable = orderableReferenceDataService.findOne(item.getOrderableDispensed());
+    }
+    if (item.getLotId() != null) {
+      lot = lotReferenceDataService.findOne(item.getLotId());
+    }
+
     return PrescriptionLineItemDto.builder()
         .id(item.getId())
         .dose(item.getDose())
@@ -395,6 +419,9 @@ public class PrescriptionService {
         .servedExternally(item.getServedExternally())
         .comments(item.getComments())
         .remainingBalance(item.getRemainingBalance())
+        .orderablePrescribedName(prescribedOrderable != null ? prescribedOrderable.getFullProductName() : null)
+        .orderableDispensedName(dispensedOrderable != null ? dispensedOrderable.getFullProductName() : null)
+        .lotCode(lot != null ? lot.getLotCode() : null)
         .build();
   }
 
