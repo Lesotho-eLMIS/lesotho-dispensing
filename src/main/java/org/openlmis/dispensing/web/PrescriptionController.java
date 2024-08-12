@@ -166,7 +166,7 @@ public class PrescriptionController extends BaseController {
     // Convert the status string to the corresponding enum
     PrescriptionStatus prescriptionStatus;
     try {
-      prescriptionStatus = status != null ? PrescriptionStatus.valueOf(status.toUpperCase()) : null;
+      prescriptionStatus = status != null ? PrescriptionStatus.valueOf(status.toUpperCase()) : PrescriptionStatus.INITIATED;
     } catch (IllegalArgumentException e) {
       throw e;
       //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status value: " + status + e.getLocalizedMessage());
