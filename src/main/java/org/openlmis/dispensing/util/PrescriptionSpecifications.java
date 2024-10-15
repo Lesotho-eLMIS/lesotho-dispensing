@@ -15,6 +15,7 @@
 
 package org.openlmis.dispensing.util;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.criteria.Predicate;
@@ -48,7 +49,7 @@ public class PrescriptionSpecifications {
    *
    * @return Specification.
    */
-  public static Specification<Prescription> hasPatientDateOfBirth(String dateOfBirth) {
+  public static Specification<Prescription> hasPatientDateOfBirth(LocalDate dateOfBirth) {
     return (root, query, cb) -> cb.equal(root.get(PATIENT_FIELD).get("dateOfBirth"), dateOfBirth);
   }
 

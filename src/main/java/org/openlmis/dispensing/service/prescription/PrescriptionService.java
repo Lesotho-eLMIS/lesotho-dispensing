@@ -580,7 +580,7 @@ public class PrescriptionService {
    * @return a prescriptions dtos.
    */
   public List<PrescriptionDto> searchPrescriptions(String patientNumber, String firstName, String lastName,
-      String dateOfBirth,
+      LocalDate dateOfBirth,
       UUID facilityUuid, String nationalId, PrescriptionStatus status, String patientType, Boolean isVoided,
       LocalDate followUpDate) {
 

@@ -21,6 +21,8 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.UUID;
 import org.openlmis.dispensing.dto.patient.PatientDto;
@@ -111,8 +113,16 @@ public class PatientController extends BaseController {
         return ResponseEntity.badRequest().body(null);
       }
     }
+    LocalDate dob = null;
+    if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
+      try {
+        dob = LocalDate.parse(dateOfBirth);  // Convert String to LocalDate
+      } catch (DateTimeParseException e) {
+        return ResponseEntity.badRequest().body(null);  // Return bad request if parsing fails
+      }
+    }
 
-    List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dateOfBirth, facilityUuid, nationalId);
+    List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dob, facilityUuid, nationalId);
     return new ResponseEntity<>(patientDtos, OK);
   }
 

@@ -152,7 +152,7 @@ public class PrescriptionController extends BaseController {
       @RequestParam(required = false) String patientNumber,
       @RequestParam(required = false) String firstName,
       @RequestParam(required = false) String lastName,
-      @RequestParam(required = false) String dateOfBirth,
+      @RequestParam(required = false) LocalDate dateOfBirth,
       @RequestParam(required = false) String facilityId,
       @RequestParam(required = false) String nationalId,
       @RequestParam(required = false) String status,

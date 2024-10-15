@@ -66,7 +66,7 @@ public class PatientService {
    * @return List of patients matching the criteria.
    */
   @Transactional(readOnly = true)
-  public List<PatientDto> searchPatients(String patientNumber, String firstName, String lastName, String dateOfBirth, UUID facilityId, String nationalId) {
+  public List<PatientDto> searchPatients(String patientNumber, String firstName, String lastName, LocalDate dateOfBirth, UUID facilityId, String nationalId) {
     Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName, dateOfBirth, facilityId, nationalId);
     return patientRepository.findAll(spec).stream()
                                           .map(this::patientToDto)
