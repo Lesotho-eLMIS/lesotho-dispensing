@@ -13,24 +13,31 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.dispensing.repository.patient;
+package org.openlmis.dispensing.service.referencedata;
 
-import java.time.LocalDate;
 import java.util.UUID;
-import org.openlmis.dispensing.domain.patient.Patient;
-// import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.query.Param;
+import org.openlmis.dispensing.dto.referencedata.GeographicZoneDto;
+import org.springframework.stereotype.Service;
 
-public interface PatientRepository extends JpaRepository<Patient, UUID>,
-    JpaSpecificationExecutor<Patient> {
-      
-  Patient findByPatientNumber(@Param("patientNumber") String patientNumber);
+@Service
+public class GeographicZoneReferenceDataService extends BaseReferenceDataService<GeographicZoneDto> {
 
-  int countByFacilityIdAndRegistrationDate(UUID facilityId, LocalDate date);
+  @Override
+  protected String getUrl() {
+    return "/api/geographicZones/";
+  }
 
-  int countByFacilityId(UUID facilityId);
+  @Override
+  protected Class<GeographicZoneDto> getResultClass() {
+    return GeographicZoneDto.class;
+  }
 
-  int countByGeoZoneId(UUID facilityId);
+  @Override
+  protected Class<GeographicZoneDto[]> getArrayResultClass() {
+    return GeographicZoneDto[].class;
+  }
+  
+  public boolean exists(UUID id) {
+    return id != null && findOne(id) != null;
+  }
 }
