@@ -36,6 +36,19 @@ public class PrescriptionSpecification {
     return (root, query, cb) -> status == null ? null : cb.equal(root.get("status"), status);
   }
 
+  /**
+  * Add statuses.
+  *
+  */
+  public static Specification<Prescription> statusIn(List<PrescriptionStatus> statuses) {
+    return (root, query, cb) -> {
+      if (statuses == null || statuses.isEmpty()) {
+        return cb.conjunction(); // No filtering if no statuses are provided
+      }
+      return root.get("status").in(statuses);
+    };
+  }
+
   public static Specification<Prescription> patientTypeEquals(String patientType) {
     return (root, query, cb) -> patientType == null ? null : cb.equal(root.get("patientType"), patientType);
   }
