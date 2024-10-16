@@ -26,13 +26,33 @@ public class PatientSpecifications {
 
   public static final String PERSON_FIELD = "person";
   
+  // /**
+  // * Specification for matching patient number.
+  // *
+  // * @return Specification.
+  // */
+  // public static Specification<Patient> hasPatientNumber(String patientNumber) {
+  //   return (root, query, cb) -> cb.equal(root.get("patientNumber"), patientNumber);
+  // }
+
   /**
-  * Specification for matching patient number.
+  * Specification for matching either the exact patient number or the last 4 characters of the patient number.
   *
   * @return Specification.
   */
   public static Specification<Patient> hasPatientNumber(String patientNumber) {
-    return (root, query, cb) -> cb.equal(root.get("patientNumber"), patientNumber);
+    return (root, query, cb) -> {
+      if (patientNumber != null) {
+        if (patientNumber.length() == 4) {
+          // If the input is exactly 4 characters, treat it as a search for the last 4 characters of the patient number
+          return cb.like(root.get("patientNumber"), "%" + patientNumber);
+        } else {
+          // Otherwise, treat it as an exact match
+          return cb.equal(root.get("patientNumber"), patientNumber);
+        }
+      }
+      return cb.conjunction(); // Return no filter if patient number is not provided
+    };
   }
 
   /**
