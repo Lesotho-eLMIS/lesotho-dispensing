@@ -115,7 +115,7 @@ public class PatientSpecifications {
   *
   * @return Specification.
   */
-  public static Specification<Patient> bySearchCriteria(String patientNumber, String firstName, String lastName, String dateOfBirth, UUID facilityId, String nationalId) {
+  public static Specification<Patient> bySearchCriteria(String patientNumber, String firstName, String lastName, String dateOfBirth, UUID facilityId, UUID geoZoneId, String nationalId) {
     return (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
       if (patientNumber != null) {
@@ -132,6 +132,9 @@ public class PatientSpecifications {
       }
       if (facilityId != null) {
         predicates.add(cb.equal(root.get("facilityId"), facilityId));
+      }
+      if (geoZoneId != null) {
+        predicates.add(cb.equal(root.get("geoZoneId"), geoZoneId));
       }
       if (nationalId != null) {
         predicates.add(cb.equal(root.get(PERSON_FIELD).get("nationalId"), nationalId));

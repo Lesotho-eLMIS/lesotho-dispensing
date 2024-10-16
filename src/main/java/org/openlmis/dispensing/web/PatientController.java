@@ -102,8 +102,10 @@ public class PatientController extends BaseController {
       @RequestParam(required = false) String lastName,
       @RequestParam(required = false) String dateOfBirth,
       @RequestParam(required = false) String facilityId,
+      @RequestParam(required = false) String geoZoneId,
       @RequestParam(required = false) String nationalId) {
     UUID facilityUuid = null;
+    UUID geoZoneUuid = null;
     if (facilityId != null && !facilityId.isEmpty()) {
       try {
         facilityUuid = UUID.fromString(facilityId);  // Convert String to UUID
@@ -112,7 +114,15 @@ public class PatientController extends BaseController {
       }
     }
 
-    List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dateOfBirth, facilityUuid, nationalId);
+    if (geoZoneId != null && !geoZoneId.isEmpty()) {
+      try {
+        geoZoneUuid = UUID.fromString(geoZoneId);  // Convert String to UUID
+      } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(null);
+      }
+    }
+
+    List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dateOfBirth, facilityUuid, geoZoneUuid, nationalId);
     return new ResponseEntity<>(patientDtos, OK);
   }
 
