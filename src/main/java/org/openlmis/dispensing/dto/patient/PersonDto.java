@@ -47,6 +47,7 @@ public class PersonDto {
   private String motherMaidenName;
   private Boolean deceased;
   private Boolean retired;
+  private String occupation;
   private List<ContactDto> contacts;
 
   /**
@@ -58,7 +59,7 @@ public class PersonDto {
     return new Person(
         firstName, lastName, nickName, nationalId, sex, dateOfBirth,
         isDobEstimated, physicalAddress, nextOfKinFullName, nextOfKinContact,
-        motherMaidenName, deceased, retired, contacts()
+        motherMaidenName, deceased, retired,occupation, contacts()
     );
   }
 
