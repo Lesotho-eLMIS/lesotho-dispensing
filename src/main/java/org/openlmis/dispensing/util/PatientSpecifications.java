@@ -118,8 +118,11 @@ public class PatientSpecifications {
   public static Specification<Patient> bySearchCriteria(String patientNumber, String firstName, String lastName, String dateOfBirth, UUID facilityId, UUID geoZoneId, String nationalId) {
     return (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
+      // if (patientNumber != null) {
+      //   predicates.add(cb.equal(root.get("patientNumber"), patientNumber));
+      // }
       if (patientNumber != null) {
-        predicates.add(cb.equal(root.get("patientNumber"), patientNumber));
+        predicates.add(hasPatientNumber(patientNumber).toPredicate(root, query, cb));
       }
       if (firstName != null) {
         predicates.add(cb.like(cb.lower(root.get(PERSON_FIELD).get("firstName")), "%" + firstName.toLowerCase() + "%"));
