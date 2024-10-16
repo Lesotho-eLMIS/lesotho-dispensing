@@ -21,6 +21,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.flywaydb.core.internal.util.StringUtils;
@@ -156,7 +157,7 @@ public class PrescriptionController extends BaseController {
       @RequestParam(required = false) String facilityId,
       @RequestParam(required = false) String geoZoneId,
       @RequestParam(required = false) String nationalId,
-      @RequestParam(required = false) String status,
+      @RequestParam(required = false) List<String> status,
       @RequestParam(required = false) String patientType,
       @RequestParam(required = false) Boolean isVoided,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate followUpDate) {
@@ -167,19 +168,24 @@ public class PrescriptionController extends BaseController {
     // Convert facilityId to UUID if not null or empty
     UUID geoZoneUuid = StringUtils.hasText(geoZoneId) ? UUID.fromString(geoZoneId) : null;
 
-    // Convert the status string to the corresponding enum
-    PrescriptionStatus prescriptionStatus;
-    try {
-      prescriptionStatus = status != null ? PrescriptionStatus.valueOf(status.toUpperCase()) : PrescriptionStatus.INITIATED;
-    } catch (IllegalArgumentException e) {
-      throw e;
-      //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status value: " + status + e.getLocalizedMessage());
+    // Convert the list of status strings to a list of PrescriptionStatus enums
+    List<PrescriptionStatus> prescriptionStatuses = new ArrayList<>();
+    if (status != null && !status.isEmpty()) {
+      for (String stat : status) {
+        try {
+          prescriptionStatuses.add(PrescriptionStatus.valueOf(stat.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+          throw e;
+          //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status value: " + stat);
+        }
+      }
     }
 
     // Call the service method to search for prescriptions
     List<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptions(
         patientNumber, firstName, lastName, dateOfBirth, facilityUuid, geoZoneUuid, nationalId,
         prescriptionStatus, patientType, isVoided, followUpDate);
+
 
     // Return the response entity with the list of PrescriptionDto
     return ResponseEntity.ok(prescriptionDtos);

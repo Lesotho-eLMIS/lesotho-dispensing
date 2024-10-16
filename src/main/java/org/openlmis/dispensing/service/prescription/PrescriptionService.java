@@ -599,7 +599,8 @@ public class PrescriptionService {
     // Create the Specification
     Specification<Prescription> spec = Specification
         .where(PrescriptionSpecification.patientIdIn(patientIds))
-        .and(PrescriptionSpecification.statusEquals(status))
+        //.and(PrescriptionSpecification.statusEquals(status))
+        .and(PrescriptionSpecification.statusIn(statuses))
         .and(PrescriptionSpecification.patientTypeEquals(patientType))
         .and(PrescriptionSpecification.isVoidedEquals(isVoided))
         .and(PrescriptionSpecification.followUpDateEquals(followUpDate));
