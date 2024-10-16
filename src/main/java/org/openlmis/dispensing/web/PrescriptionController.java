@@ -184,7 +184,7 @@ public class PrescriptionController extends BaseController {
     // Call the service method to search for prescriptions
     List<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptions(
         patientNumber, firstName, lastName, dateOfBirth, facilityUuid, geoZoneUuid, nationalId,
-        prescriptionStatus, patientType, isVoided, followUpDate);
+        prescriptionStatuses, patientType, isVoided, followUpDate);
 
 
     // Return the response entity with the list of PrescriptionDto

@@ -581,7 +581,7 @@ public class PrescriptionService {
    */
   public List<PrescriptionDto> searchPrescriptions(String patientNumber, String firstName, String lastName,
       String dateOfBirth,
-      UUID facilityUuid, UUID geoZoneUuid, String nationalId, PrescriptionStatus status, String patientType, Boolean isVoided,
+      UUID facilityUuid, UUID geoZoneUuid, String nationalId, List<PrescriptionStatus> statuses, String patientType, Boolean isVoided,
       LocalDate followUpDate) {
 
     // First, find the patients based on the given patient details
