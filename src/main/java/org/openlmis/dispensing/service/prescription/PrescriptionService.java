@@ -51,6 +51,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -613,6 +616,49 @@ public class PrescriptionService {
         : prescriptions.stream()
             .map(this::prescriptionToDto)
             .collect(Collectors.toList());
+  }
+
+  /**
+   * Get a Prescription based on parameters.
+   *
+   *
+   * @return a prescriptions dtos.
+   */
+  public Page<PrescriptionDto> searchPrescriptionsV2(String patientNumber, String firstName, String lastName,
+      String dateOfBirth,
+      UUID facilityUuid, UUID geoZoneUuid, String nationalId, List<PrescriptionStatus> statuses, String patientType, Boolean isVoided,
+      LocalDate followUpDate, int page, int size) {
+
+    // First, find the patients based on the given patient details
+    // Use the paginated patient search method
+    // Page<PatientDto> patientDtos = patientService.searchPatientsV2(patientNumber, firstName, lastName, dateOfBirth,
+    //     facilityUuid, geoZoneUuid, nationalId, page, size);
+    List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dateOfBirth,
+        facilityUuid, geoZoneUuid, nationalId);
+
+    if (patientDtos.isEmpty()) {
+      return Page.empty();
+    }
+
+    // Extract the patient IDs from the found patients and convert them to string
+    List<UUID> patientIds = patientDtos.stream()
+        .map(PatientDto::getId)
+        .collect(Collectors.toList());
+    // Create the Specification
+    Specification<Prescription> spec = Specification
+        .where(PrescriptionSpecification.patientIdIn(patientIds))
+        //.and(PrescriptionSpecification.statusEquals(status))
+        .and(PrescriptionSpecification.statusIn(statuses))
+        .and(PrescriptionSpecification.patientTypeEquals(patientType))
+        .and(PrescriptionSpecification.isVoidedEquals(isVoided))
+        .and(PrescriptionSpecification.followUpDateEquals(followUpDate));
+
+    Pageable pageable = PageRequest.of(page, size);
+    // Then, search for prescriptions based on the Specification
+    Page<Prescription> prescriptionsPage = prescriptionRepository.findAll(spec, pageable);
+
+    // Convert Prescription entities to PrescriptionDto objects
+    return prescriptionsPage.map(this::prescriptionToDto);
   }
 
 }
