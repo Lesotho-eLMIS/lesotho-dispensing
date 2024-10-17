@@ -45,6 +45,7 @@ public class Person extends BaseEntity {
   private String motherMaidenName;
   private Boolean deceased;
   private Boolean retired;
+  private String occupation;
 
   @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Contact> contacts;
