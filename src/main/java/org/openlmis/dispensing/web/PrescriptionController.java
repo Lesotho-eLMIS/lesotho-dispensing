@@ -21,6 +21,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -180,10 +181,18 @@ public class PrescriptionController extends BaseController {
         }
       }
     }
+    LocalDate dob = null;
+    if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
+      try {
+        dob = LocalDate.parse(dateOfBirth);  // Convert String to LocalDate
+      } catch (DateTimeParseException e) {
+        return ResponseEntity.badRequest().body(null);  // Return bad request if parsing fails
+      }
+    }
 
     // Call the service method to search for prescriptions
     List<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptions(
-        patientNumber, firstName, lastName, dateOfBirth, facilityUuid, geoZoneUuid, nationalId,
+        patientNumber, firstName, lastName, dob, facilityUuid, geoZoneUuid, nationalId,
         prescriptionStatuses, patientType, isVoided, followUpDate);
 
 

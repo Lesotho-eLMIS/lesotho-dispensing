@@ -380,7 +380,7 @@ public class PrescriptionService {
   /**
    * Convert PrescriptionLineItem entity to PrescriptionLineItemDto.
    *
-   * @param lineItem PrescriptionLineItem entity.
+   * @param item PrescriptionLineItem entity.
    * @return PrescriptionLineItemDto.
    */
   private PrescriptionLineItemDto lineItemToDto(PrescriptionLineItem item) {
@@ -580,7 +580,7 @@ public class PrescriptionService {
    * @return a prescriptions dtos.
    */
   public List<PrescriptionDto> searchPrescriptions(String patientNumber, String firstName, String lastName,
-      String dateOfBirth,
+      LocalDate dateOfBirth,
       UUID facilityUuid, UUID geoZoneUuid, String nationalId, List<PrescriptionStatus> statuses, String patientType, Boolean isVoided,
       LocalDate followUpDate) {
 

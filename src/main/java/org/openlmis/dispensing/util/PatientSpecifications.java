@@ -15,6 +15,7 @@
 
 package org.openlmis.dispensing.util;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -106,7 +107,7 @@ public class PatientSpecifications {
   *
   * @return Specification.
   */
-  public static Specification<Patient> hasDateOfBirth(String dateOfBirth) {
+  public static Specification<Patient> hasDateOfBirth(LocalDate dateOfBirth) {
     return (root, query, cb) -> cb.equal(root.get(PERSON_FIELD).get("dateOfBirth"), dateOfBirth);
   }
 
@@ -115,7 +116,7 @@ public class PatientSpecifications {
   *
   * @return Specification.
   */
-  public static Specification<Patient> bySearchCriteria(String patientNumber, String firstName, String lastName, String dateOfBirth, UUID facilityId, UUID geoZoneId, String nationalId) {
+  public static Specification<Patient> bySearchCriteria(String patientNumber, String firstName, String lastName, LocalDate dateOfBirth, UUID facilityId, UUID geoZoneId, String nationalId) {
     return (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
       // if (patientNumber != null) {
