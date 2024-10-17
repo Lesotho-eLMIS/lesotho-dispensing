@@ -163,6 +163,7 @@ public class PatientService {
     person.setMotherMaidenName(personDto.getMotherMaidenName());
     person.setDeceased(personDto.getDeceased());
     person.setRetired(personDto.getRetired());
+    person.setOccupation(personDto.getOccupation());
     if (personDto.getContacts() != null) {
       person.setContacts(personDto.getContacts().stream()
                             .map(contactDto -> convertToContactEntity(contactDto, person))
