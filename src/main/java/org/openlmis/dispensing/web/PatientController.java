@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.core.context.SecurityContextHolder;
 // import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -133,6 +134,54 @@ public class PatientController extends BaseController {
     }
 
     List<PatientDto> patientDtos = patientService.searchPatients(patientNumber, firstName, lastName, dob, facilityUuid, geoZoneUuid, nationalId);
+    return new ResponseEntity<>(patientDtos, OK);
+  }
+
+  /**
+   * List patients matching the given attributes with pagination support (v2).
+   *
+   * @param patientNumber unique patient number.
+   * @param firstName patient first name.
+   * @param lastName patient last name.
+   * @param dateOfBirth patient date of birth.
+   * @param facilityId facility UUID as a string.
+   * @param geoZoneId geographic zone UUID as a string.
+   * @param nationalId national ID.
+   * @param page the page number to retrieve.
+   * @param size the size of the page to retrieve.
+   * @return Page of patients matching the given attributes.
+   */
+  @GetMapping("/v2")
+  public ResponseEntity<Page<PatientDto>> searchPatientsV2(
+      @RequestParam(required = false) String patientNumber,
+      @RequestParam(required = false) String firstName,
+      @RequestParam(required = false) String lastName,
+      @RequestParam(required = false) String dateOfBirth,
+      @RequestParam(required = false) String facilityId,
+      @RequestParam(required = false) String geoZoneId,
+      @RequestParam(required = false) String nationalId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size) {
+
+    UUID facilityUuid = null;
+    UUID geoZoneUuid = null;
+    if (facilityId != null && !facilityId.isEmpty()) {
+      try {
+        facilityUuid = UUID.fromString(facilityId);  // Convert String to UUID
+      } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(null);
+      }
+    }
+
+    if (geoZoneId != null && !geoZoneId.isEmpty()) {
+      try {
+        geoZoneUuid = UUID.fromString(geoZoneId);  // Convert String to UUID
+      } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(null);
+      }
+    }
+
+    Page<PatientDto> patientDtos = patientService.searchPatientsV2(patientNumber, firstName, lastName, dateOfBirth, facilityUuid, geoZoneUuid, nationalId, page, size);
     return new ResponseEntity<>(patientDtos, OK);
   }
 

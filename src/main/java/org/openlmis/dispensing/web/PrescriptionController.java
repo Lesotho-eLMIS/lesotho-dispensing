@@ -25,6 +25,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.flywaydb.core.internal.util.StringUtils;
 import org.openlmis.dispensing.domain.status.PrescriptionStatus;
 import org.openlmis.dispensing.dto.prescription.PrescriptionDto;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -200,4 +202,52 @@ public class PrescriptionController extends BaseController {
     return ResponseEntity.ok(prescriptionDtos);
   }
 
+  /**
+   * Get prescriptions based on parameters.
+   *
+   * @return List of all prescriptions.
+   */
+  @GetMapping("/v2")
+  public ResponseEntity<Page<PrescriptionDto>> searchPrescriptionsV2(
+      @RequestParam(required = false) String patientNumber,
+      @RequestParam(required = false) String firstName,
+      @RequestParam(required = false) String lastName,
+      @RequestParam(required = false) String dateOfBirth,
+      @RequestParam(required = false) String facilityId,
+      @RequestParam(required = false) String geoZoneId,
+      @RequestParam(required = false) String nationalId,
+      @RequestParam(required = false) List<String> status,
+      @RequestParam(required = false) String patientType,
+      @RequestParam(required = false) Boolean isVoided,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate followUpDate,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size) {
+
+    UUID facilityUuid = null;
+    UUID geoZoneUuid = null;
+    if (facilityId != null && !facilityId.isEmpty()) {
+      try {
+        facilityUuid = UUID.fromString(facilityId);  // Convert String to UUID
+      } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(null);
+      }
+    }
+
+    if (geoZoneId != null && !geoZoneId.isEmpty()) {
+      try {
+        geoZoneUuid = UUID.fromString(geoZoneId);  // Convert String to UUID
+      } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(null);
+      }
+    }
+
+    List<PrescriptionStatus> statuses = status != null ? status.stream()
+        .map(PrescriptionStatus::valueOf)
+        .collect(Collectors.toList()) : null;
+
+    Page<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptionsV2(patientNumber, firstName, lastName, 
+        dateOfBirth, facilityUuid, geoZoneUuid, nationalId, statuses, patientType, isVoided, followUpDate, page, size);
+    
+    return new ResponseEntity<>(prescriptionDtos, OK);
+  }
 }

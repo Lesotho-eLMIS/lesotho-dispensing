@@ -42,6 +42,9 @@ import org.openlmis.dispensing.util.PatientSpecifications;
 //import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +78,25 @@ public class PatientService {
     return patientRepository.findAll(spec).stream()
                                           .map(this::patientToDto)
                                           .collect(Collectors.toList());
+  }
+
+  /**
+   * Search for patients.
+   *
+   * @param patientNumber unique patient number.
+   * @param firstName patient first name.
+   * @param lastName patient last name.
+   * @param dateOfBirth patient date of birth.
+   * @return List of patients matching the criteria.
+   */
+  @Transactional(readOnly = true)
+  public Page<PatientDto> searchPatientsV2(String patientNumber, String firstName, String lastName, 
+      String dateOfBirth, UUID facilityId, UUID geoZoneId, String nationalId, int page, int size) {
+    
+    Pageable pageable = PageRequest.of(page, size);
+    Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName, dateOfBirth, facilityId, geoZoneId, nationalId);
+    Page<Patient> patientsPage = patientRepository.findAll(spec, pageable);
+    return patientsPage.map(this::patientToDto);
   }
 
   /**
