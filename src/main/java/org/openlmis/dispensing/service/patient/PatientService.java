@@ -35,6 +35,7 @@ import org.openlmis.dispensing.dto.patient.PatientDto;
 import org.openlmis.dispensing.dto.patient.PersonDto;
 import org.openlmis.dispensing.repository.patient.PatientRepository;
 import org.openlmis.dispensing.service.referencedata.FacilityReferenceDataService;
+import org.openlmis.dispensing.service.referencedata.GeographicZoneReferenceDataService;
 import org.openlmis.dispensing.util.PatientSpecifications;
 
 //import org.slf4j.Logger;
@@ -56,6 +57,9 @@ public class PatientService {
   @Autowired
   private FacilityReferenceDataService facilityReferenceDataService;
 
+  @Autowired
+  private GeographicZoneReferenceDataService geographicZoneReferenceDataService;
+
   /**
    * Search for patients.
    *
@@ -66,8 +70,8 @@ public class PatientService {
    * @return List of patients matching the criteria.
    */
   @Transactional(readOnly = true)
-  public List<PatientDto> searchPatients(String patientNumber, String firstName, String lastName, String dateOfBirth, UUID facilityId, String nationalId) {
-    Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName, dateOfBirth, facilityId, nationalId);
+  public List<PatientDto> searchPatients(String patientNumber, String firstName, String lastName, String dateOfBirth, UUID facilityId, UUID geoZoneId, String nationalId) {
+    Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName, dateOfBirth, facilityId, geoZoneId, nationalId);
     return patientRepository.findAll(spec).stream()
                                           .map(this::patientToDto)
                                           .collect(Collectors.toList());
@@ -118,15 +122,18 @@ public class PatientService {
     }
     
     //given facility SHOULD exist
-    if (facilityReferenceDataService.exists(patientDto.getFacilityId())) {
+    if (facilityReferenceDataService.exists(patientDto.getFacilityId())
+        && geographicZoneReferenceDataService.exists(patientDto.getGeoZoneId())) {
       Patient patient = new Patient();
       LocalDate today = LocalDate.now();
 
-      String facilityCode = facilityReferenceDataService.findOne(patientDto.getFacilityId()).getCode();
-
-      patient.setPatientNumber(generatePatientNumber(patientDto.getFacilityId(), facilityCode, today));
+      //String facilityCode = facilityReferenceDataService.findOne(patientDto.getFacilityId()).getCode();
+      String geoZoneCode = geographicZoneReferenceDataService.findOne(patientDto.getGeoZoneId()).getCode();
+      //patient.setPatientNumber(generatePatientNumber(patientDto.getFacilityId(), facilityCode, today));
+      patient.setPatientNumber(generatePatientNumber(patientDto.getGeoZoneId(), geoZoneCode, today));
       patient.setPerson(convertToPersonEntity(patientDto.getPersonDto()));
       patient.setFacilityId(patientDto.getFacilityId());
+      patient.setGeoZoneId(patientDto.getGeoZoneId());
       patient.setRegistrationDate(today);
       if (patientDto.getMedicalHistory() != null) {
         patient.setMedicalHistory(patientDto.getMedicalHistory().stream()
@@ -190,6 +197,7 @@ public class PatientService {
       .id(patient.getId())
       .patientNumber(patient.getPatientNumber())
       .facilityId(patient.getFacilityId())
+      .geoZoneId(patient.getGeoZoneId())
       .registrationDate(patient.getRegistrationDate())
       .personDto(personToDto(patient.getPerson()))
       .medicalHistory(patient.getMedicalHistory() != null
@@ -335,7 +343,8 @@ public class PatientService {
   private synchronized String generatePatientNumber(UUID facilityId, String facilityCode, LocalDate date) {
     String datePart = date.format(DATE_FORMAT);
     //int countToday = patientRepository.countByFacilityIdAndRegistrationDate(facilityId, date);
-    int countSoFar = patientRepository.countByFacilityId(facilityId);
+    //int countSoFar = patientRepository.countByFacilityId(facilityId);
+    int countSoFar = patientRepository.countByGeoZoneId(facilityId);
     return facilityCode + "/" + datePart + "/" + String.format("%05d", countSoFar + 1);
   }
 

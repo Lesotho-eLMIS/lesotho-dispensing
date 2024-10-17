@@ -45,6 +45,9 @@ public class Patient extends BaseEntity {
   @Column(nullable = false)
   private UUID facilityId;
 
+  @Column(name = "geozoneid") //named to match naming in flyway migration
+  private UUID geoZoneId;
+
   @Column(nullable = false)
   private LocalDate registrationDate;
 

@@ -33,6 +33,7 @@ public class PatientDto {
   private UUID id;
   private String patientNumber;
   private UUID facilityId;
+  private UUID geoZoneId;
   private LocalDate registrationDate;
   private PersonDto personDto;
   private List<MedicalHistoryDto> medicalHistory;

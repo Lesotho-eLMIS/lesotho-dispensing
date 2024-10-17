@@ -155,6 +155,7 @@ public class PrescriptionController extends BaseController {
       @RequestParam(required = false) String lastName,
       @RequestParam(required = false) String dateOfBirth,
       @RequestParam(required = false) String facilityId,
+      @RequestParam(required = false) String geoZoneId,
       @RequestParam(required = false) String nationalId,
       @RequestParam(required = false) List<String> status,
       @RequestParam(required = false) String patientType,
@@ -163,6 +164,9 @@ public class PrescriptionController extends BaseController {
 
     // Convert facilityId to UUID if not null or empty
     UUID facilityUuid = StringUtils.hasText(facilityId) ? UUID.fromString(facilityId) : null;
+
+    // Convert facilityId to UUID if not null or empty
+    UUID geoZoneUuid = StringUtils.hasText(geoZoneId) ? UUID.fromString(geoZoneId) : null;
 
     // Convert the list of status strings to a list of PrescriptionStatus enums
     List<PrescriptionStatus> prescriptionStatuses = new ArrayList<>();
@@ -179,8 +183,9 @@ public class PrescriptionController extends BaseController {
 
     // Call the service method to search for prescriptions
     List<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptions(
-        patientNumber, firstName, lastName, dateOfBirth, facilityUuid, nationalId,
+        patientNumber, firstName, lastName, dateOfBirth, facilityUuid, geoZoneUuid, nationalId,
         prescriptionStatuses, patientType, isVoided, followUpDate);
+
 
     // Return the response entity with the list of PrescriptionDto
     return ResponseEntity.ok(prescriptionDtos);
