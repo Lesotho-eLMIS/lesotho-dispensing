@@ -91,7 +91,7 @@ public class PatientService {
    */
   @Transactional(readOnly = true)
   public Page<PatientDto> searchPatientsV2(String patientNumber, String firstName, String lastName, 
-      String dateOfBirth, UUID facilityId, UUID geoZoneId, String nationalId, int page, int size) {
+      LocalDate dateOfBirth, UUID facilityId, UUID geoZoneId, String nationalId, int page, int size) {
     
     Pageable pageable = PageRequest.of(page, size);
     Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName, dateOfBirth, facilityId, geoZoneId, nationalId);

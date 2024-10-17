@@ -181,7 +181,16 @@ public class PatientController extends BaseController {
       }
     }
 
-    Page<PatientDto> patientDtos = patientService.searchPatientsV2(patientNumber, firstName, lastName, dateOfBirth, facilityUuid, geoZoneUuid, nationalId, page, size);
+    LocalDate dob = null;
+    if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
+      try {
+        dob = LocalDate.parse(dateOfBirth);  // Convert String to LocalDate
+      } catch (DateTimeParseException e) {
+        return ResponseEntity.badRequest().body(null);  // Return bad request if parsing fails
+      }
+    }
+
+    Page<PatientDto> patientDtos = patientService.searchPatientsV2(patientNumber, firstName, lastName, dob, facilityUuid, geoZoneUuid, nationalId, page, size);
     return new ResponseEntity<>(patientDtos, OK);
   }
 

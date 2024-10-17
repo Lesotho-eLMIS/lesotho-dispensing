@@ -625,7 +625,7 @@ public class PrescriptionService {
    * @return a prescriptions dtos.
    */
   public Page<PrescriptionDto> searchPrescriptionsV2(String patientNumber, String firstName, String lastName,
-      String dateOfBirth,
+      LocalDate dateOfBirth,
       UUID facilityUuid, UUID geoZoneUuid, String nationalId, List<PrescriptionStatus> statuses, String patientType, Boolean isVoided,
       LocalDate followUpDate, int page, int size) {
 

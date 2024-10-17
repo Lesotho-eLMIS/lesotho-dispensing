@@ -241,12 +241,21 @@ public class PrescriptionController extends BaseController {
       }
     }
 
+    LocalDate dob = null;
+    if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
+      try {
+        dob = LocalDate.parse(dateOfBirth);  // Convert String to LocalDate
+      } catch (DateTimeParseException e) {
+        return ResponseEntity.badRequest().body(null);  // Return bad request if parsing fails
+      }
+    }
+
     List<PrescriptionStatus> statuses = status != null ? status.stream()
         .map(PrescriptionStatus::valueOf)
         .collect(Collectors.toList()) : null;
 
     Page<PrescriptionDto> prescriptionDtos = prescriptionService.searchPrescriptionsV2(patientNumber, firstName, lastName, 
-        dateOfBirth, facilityUuid, geoZoneUuid, nationalId, statuses, patientType, isVoided, followUpDate, page, size);
+        dob, facilityUuid, geoZoneUuid, nationalId, statuses, patientType, isVoided, followUpDate, page, size);
     
     return new ResponseEntity<>(prescriptionDtos, OK);
   }
