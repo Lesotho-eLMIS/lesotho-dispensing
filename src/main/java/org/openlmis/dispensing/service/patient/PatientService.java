@@ -231,6 +231,7 @@ public class PatientService {
       .motherMaidenName(person.getMotherMaidenName())
       .deceased(person.getDeceased())
       .retired(person.getRetired())
+            .occupation(person.getOccupation())
       .contacts(person.getContacts() != null 
           ? person.getContacts().stream()
                                 .map(this::contactToDto)
