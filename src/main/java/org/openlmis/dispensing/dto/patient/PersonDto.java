@@ -50,7 +50,7 @@ public class PersonDto {
   private Boolean retired;
   private String chief;
   private String occupation;
-  private Location location;
+  private UUID locationId;
   private List<ContactDto> contacts;
 
   /**
@@ -62,7 +62,7 @@ public class PersonDto {
     return new Person(
         firstName, lastName, nickName, nationalId, sex, dateOfBirth,
         isDobEstimated, physicalAddress, nextOfKinFullName, nextOfKinContact,
-        motherMaidenName, deceased, retired, chief,occupation,location, contacts()
+        motherMaidenName, deceased, retired, chief,occupation,locationId, contacts()
     );
   }
 

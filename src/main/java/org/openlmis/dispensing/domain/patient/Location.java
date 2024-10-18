@@ -16,4 +16,5 @@ public class Location extends BaseEntity {
     private String district;
     private String village;
     private String constituency;
+    private String chief;
 }

@@ -201,7 +201,7 @@ public class PatientController extends BaseController {
   @GetMapping(ID_PATH_VARIABLE)
   @ResponseStatus(OK)
   @ResponseBody
-  public ResponseEntity<PatientDto> getPatien(@PathVariable UUID id) {
+  public ResponseEntity<PatientDto> getPatient(@PathVariable UUID id) {
     PatientDto patient = patientService.getPatientById(id);
     return new ResponseEntity<>(patient, OK);
   }
