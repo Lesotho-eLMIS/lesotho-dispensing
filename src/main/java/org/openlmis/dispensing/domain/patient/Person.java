@@ -47,7 +47,6 @@ public class Person extends BaseEntity {
   private Boolean retired;
   private String chief;
   private String occupation;
-
   @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Contact> contacts;
   //dates for events needed?? e.g. deceased, retired, created, etc.

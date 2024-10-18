@@ -186,6 +186,7 @@ public class PatientService {
     person.setDeceased(personDto.getDeceased());
     person.setRetired(personDto.getRetired());
     person.setOccupation(personDto.getOccupation());
+    person.setChief(personDto.getChief());
     if (personDto.getContacts() != null) {
       person.setContacts(personDto.getContacts().stream()
                             .map(contactDto -> convertToContactEntity(contactDto, person))
@@ -253,6 +254,7 @@ public class PatientService {
       .motherMaidenName(person.getMotherMaidenName())
       .deceased(person.getDeceased())
       .retired(person.getRetired())
+            .chief(person.getChief())
             .occupation(person.getOccupation())
       .contacts(person.getContacts() != null 
           ? person.getContacts().stream()
