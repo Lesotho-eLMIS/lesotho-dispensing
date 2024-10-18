@@ -26,6 +26,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.patient.Contact;
+import org.openlmis.dispensing.domain.patient.Location;
 import org.openlmis.dispensing.domain.patient.Person;
 
 @Data
@@ -49,6 +50,7 @@ public class PersonDto {
   private Boolean retired;
   private String chief;
   private String occupation;
+  private Location location;
   private List<ContactDto> contacts;
 
   /**
@@ -60,7 +62,7 @@ public class PersonDto {
     return new Person(
         firstName, lastName, nickName, nationalId, sex, dateOfBirth,
         isDobEstimated, physicalAddress, nextOfKinFullName, nextOfKinContact,
-        motherMaidenName, deceased, retired, chief,occupation, contacts()
+        motherMaidenName, deceased, retired, chief,occupation,location, contacts()
     );
   }
 
