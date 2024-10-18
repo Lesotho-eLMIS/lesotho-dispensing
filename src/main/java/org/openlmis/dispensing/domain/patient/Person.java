@@ -45,8 +45,8 @@ public class Person extends BaseEntity {
   private String motherMaidenName;
   private Boolean deceased;
   private Boolean retired;
-  private String chief;
-  private String occupation;
+  private String chief;// new but should be removed after creation of Location
+  private String occupation; //
   @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Contact> contacts;
   //dates for events needed?? e.g. deceased, retired, created, etc.
