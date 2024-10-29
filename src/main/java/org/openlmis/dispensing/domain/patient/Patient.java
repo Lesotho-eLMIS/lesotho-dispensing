@@ -31,6 +31,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.openlmis.dispensing.domain.BaseEntity;
 import org.openlmis.dispensing.domain.prescription.Prescription;
+import org.openlmis.dispensing.domain.vital.Vital;
 
 @Entity
 @Data
@@ -38,6 +39,7 @@ import org.openlmis.dispensing.domain.prescription.Prescription;
 @AllArgsConstructor
 @Table(name = "patient", schema = "dispensing")
 public class Patient extends BaseEntity {
+  private static final String PATIENT = "patient";
 
   @Column(nullable = false, unique = true)
   private String patientNumber;
@@ -45,7 +47,7 @@ public class Patient extends BaseEntity {
   @Column(nullable = false)
   private UUID facilityId;
 
-  @Column(name = "geozoneid") //named to match naming in flyway migration
+  @Column(name = "geozoneid") // named to match naming in flyway migration
   private UUID geoZoneId;
 
   @Column(nullable = false)
@@ -55,8 +57,10 @@ public class Patient extends BaseEntity {
   @JoinColumn(name = "person_id", referencedColumnName = "id")
   private Person person;
 
-  @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = PATIENT, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<MedicalHistory> medicalHistory;
-  @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = PATIENT, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Prescription> prescriptions;
+  @OneToMany(mappedBy = PATIENT, cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Vital> vitals;
 }

@@ -51,7 +51,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PatientService {
-  //private static final Logger LOGGER = LoggerFactory.getLogger(PatientService.class);
+  // private static final Logger LOGGER =
+  // LoggerFactory.getLogger(PatientService.class);
   private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
   @Autowired
@@ -67,34 +68,37 @@ public class PatientService {
    * Search for patients.
    *
    * @param patientNumber unique patient number.
-   * @param firstName patient first name.
-   * @param lastName patient last name.
-   * @param dateOfBirth patient date of birth.
+   * @param firstName     patient first name.
+   * @param lastName      patient last name.
+   * @param dateOfBirth   patient date of birth.
    * @return List of patients matching the criteria.
    */
   @Transactional(readOnly = true)
-  public List<PatientDto> searchPatients(String patientNumber, String firstName, String lastName, LocalDate dateOfBirth, UUID facilityId, UUID geoZoneId, String nationalId) {
-    Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName, dateOfBirth, facilityId, geoZoneId, nationalId);
+  public List<PatientDto> searchPatients(String patientNumber, String firstName, String lastName, LocalDate dateOfBirth,
+      UUID facilityId, UUID geoZoneId, String nationalId) {
+    Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName,
+        dateOfBirth, facilityId, geoZoneId, nationalId);
     return patientRepository.findAll(spec).stream()
-                                          .map(this::patientToDto)
-                                          .collect(Collectors.toList());
+        .map(this::patientToDto)
+        .collect(Collectors.toList());
   }
 
   /**
    * Search for patients.
    *
    * @param patientNumber unique patient number.
-   * @param firstName patient first name.
-   * @param lastName patient last name.
-   * @param dateOfBirth patient date of birth.
+   * @param firstName     patient first name.
+   * @param lastName      patient last name.
+   * @param dateOfBirth   patient date of birth.
    * @return List of patients matching the criteria.
    */
   @Transactional(readOnly = true)
-  public Page<PatientDto> searchPatientsV2(String patientNumber, String firstName, String lastName, 
+  public Page<PatientDto> searchPatientsV2(String patientNumber, String firstName, String lastName,
       LocalDate dateOfBirth, UUID facilityId, UUID geoZoneId, String nationalId, int page, int size) {
-    
+
     Pageable pageable = PageRequest.of(page, size);
-    Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName, dateOfBirth, facilityId, geoZoneId, nationalId);
+    Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, firstName, lastName,
+        dateOfBirth, facilityId, geoZoneId, nationalId);
     Page<Patient> patientsPage = patientRepository.findAll(spec, pageable);
     return patientsPage.map(this::patientToDto);
   }
@@ -102,7 +106,7 @@ public class PatientService {
   /**
    * Update a Patient.
    *
-   * @param id patient id.
+   * @param id  patient id.
    * @param dto patient dto.
    * @return a updated patient dto.
    */
@@ -142,16 +146,18 @@ public class PatientService {
     if (null == patientDto) {
       return null;
     }
-    
-    //given facility SHOULD exist
+
+    // given facility SHOULD exist
     if (facilityReferenceDataService.exists(patientDto.getFacilityId())
         && geographicZoneReferenceDataService.exists(patientDto.getGeoZoneId())) {
       Patient patient = new Patient();
       LocalDate today = LocalDate.now();
 
-      //String facilityCode = facilityReferenceDataService.findOne(patientDto.getFacilityId()).getCode();
+      // String facilityCode =
+      // facilityReferenceDataService.findOne(patientDto.getFacilityId()).getCode();
       String geoZoneCode = geographicZoneReferenceDataService.findOne(patientDto.getGeoZoneId()).getCode();
-      //patient.setPatientNumber(generatePatientNumber(patientDto.getFacilityId(), facilityCode, today));
+      // patient.setPatientNumber(generatePatientNumber(patientDto.getFacilityId(),
+      // facilityCode, today));
       patient.setPatientNumber(generatePatientNumber(patientDto.getGeoZoneId(), geoZoneCode, today));
       patient.setPerson(convertToPersonEntity(patientDto.getPersonDto()));
       patient.setFacilityId(patientDto.getFacilityId());
@@ -189,8 +195,8 @@ public class PatientService {
     person.setChief(personDto.getChief());
     if (personDto.getContacts() != null) {
       person.setContacts(personDto.getContacts().stream()
-                            .map(contactDto -> convertToContactEntity(contactDto, person))
-                            .collect(Collectors.toList()));
+          .map(contactDto -> convertToContactEntity(contactDto, person))
+          .collect(Collectors.toList()));
     }
     return person;
   }
@@ -199,17 +205,17 @@ public class PatientService {
     if (contactDto == null) {
       return null;
     }
-    return new Contact(contactDto.getContactType(),contactDto.getContactValue(), person);
+    return new Contact(contactDto.getContactType(), contactDto.getContactValue(), person);
   }
 
   private MedicalHistory convertToMedicalHistoryEntity(MedicalHistoryDto medicalHistoryDto, Patient patient) {
     if (medicalHistoryDto == null || medicalHistoryDto.getType() == null
-          || medicalHistoryDto.getHistory() == null) {
+        || medicalHistoryDto.getHistory() == null) {
       return null;
     }
     return new MedicalHistory(medicalHistoryDto.getType(), medicalHistoryDto.getHistory(), patient);
   }
-  
+
   /**
    * Create dto from jpa model.
    *
@@ -218,18 +224,18 @@ public class PatientService {
    */
   private PatientDto patientToDto(Patient patient) {
     return PatientDto.builder()
-      .id(patient.getId())
-      .patientNumber(patient.getPatientNumber())
-      .facilityId(patient.getFacilityId())
-      .geoZoneId(patient.getGeoZoneId())
-      .registrationDate(patient.getRegistrationDate())
-      .personDto(personToDto(patient.getPerson()))
-      .medicalHistory(patient.getMedicalHistory() != null
-          ? patient.getMedicalHistory().stream()
-                                       .map(this::medicalHistoryToDto)
-                                       .collect(Collectors.toList())
-          : null)
-      .build();
+        .id(patient.getId())
+        .patientNumber(patient.getPatientNumber())
+        .facilityId(patient.getFacilityId())
+        .geoZoneId(patient.getGeoZoneId())
+        .registrationDate(patient.getRegistrationDate())
+        .personDto(personToDto(patient.getPerson()))
+        .medicalHistory(patient.getMedicalHistory() != null
+            ? patient.getMedicalHistory().stream()
+                .map(this::medicalHistoryToDto)
+                .collect(Collectors.toList())
+            : null)
+        .build();
   }
 
   /**
@@ -240,28 +246,28 @@ public class PatientService {
    */
   private PersonDto personToDto(Person person) {
     return PersonDto.builder()
-      .id(person.getId())
-      .nationalId(person.getNationalId())
-      .firstName(person.getFirstName())
-      .lastName(person.getLastName())
-      .nickName(person.getNickName())
-      .dateOfBirth(person.getDateOfBirth())
-      .sex(person.getSex())
-      .isDobEstimated(person.getIsDobEstimated())
-      .physicalAddress(person.getPhysicalAddress())
-      .nextOfKinFullName(person.getNextOfKinFullName())
-      .nextOfKinContact(person.getNextOfKinContact())
-      .motherMaidenName(person.getMotherMaidenName())
-      .deceased(person.getDeceased())
-      .retired(person.getRetired())
-            .chief(person.getChief())
-            .occupation(person.getOccupation())
-      .contacts(person.getContacts() != null 
-          ? person.getContacts().stream()
-                                .map(this::contactToDto)
-                                .collect(Collectors.toList())
-          : null)
-      .build();
+        .id(person.getId())
+        .nationalId(person.getNationalId())
+        .firstName(person.getFirstName())
+        .lastName(person.getLastName())
+        .nickName(person.getNickName())
+        .dateOfBirth(person.getDateOfBirth())
+        .sex(person.getSex())
+        .isDobEstimated(person.getIsDobEstimated())
+        .physicalAddress(person.getPhysicalAddress())
+        .nextOfKinFullName(person.getNextOfKinFullName())
+        .nextOfKinContact(person.getNextOfKinContact())
+        .motherMaidenName(person.getMotherMaidenName())
+        .deceased(person.getDeceased())
+        .retired(person.getRetired())
+        .chief(person.getChief())
+        .occupation(person.getOccupation())
+        .contacts(person.getContacts() != null
+            ? person.getContacts().stream()
+                .map(this::contactToDto)
+                .collect(Collectors.toList())
+            : null)
+        .build();
   }
 
   /**
@@ -276,10 +282,10 @@ public class PatientService {
     }
 
     return ContactDto.builder()
-      .id(contact.getId())
-      .contactType(contact.getContactType())
-      .contactValue(contact.getContactValue())
-      .build();
+        .id(contact.getId())
+        .contactType(contact.getContactType())
+        .contactValue(contact.getContactValue())
+        .build();
   }
 
   /**
@@ -294,10 +300,10 @@ public class PatientService {
     }
 
     return MedicalHistoryDto.builder()
-      .id(medicalHistory.getId())
-      .type(medicalHistory.getType())
-      .history(medicalHistory.getHistory())
-      .build();
+        .id(medicalHistory.getId())
+        .type(medicalHistory.getType())
+        .history(medicalHistory.getHistory())
+        .build();
   }
 
   private void updatePatientEntity(Patient patient, PatientDto patientDto) {
@@ -357,19 +363,20 @@ public class PatientService {
     if (personDto.getRetired() != null) {
       person.setRetired(personDto.getRetired());
     }
-    
-    if (personDto.getContacts() != null) { //update contacts
+
+    if (personDto.getContacts() != null) { // update contacts
       person.getContacts().clear();
       person.getContacts().addAll(personDto.getContacts().stream()
           .map(contactDto -> convertToContactEntity(contactDto, person))
           .collect(Collectors.toList()));
     }
-  } 
+  }
 
   private synchronized String generatePatientNumber(UUID facilityId, String facilityCode, LocalDate date) {
     String datePart = date.format(DATE_FORMAT);
-    //int countToday = patientRepository.countByFacilityIdAndRegistrationDate(facilityId, date);
-    //int countSoFar = patientRepository.countByFacilityId(facilityId);
+    // int countToday =
+    // patientRepository.countByFacilityIdAndRegistrationDate(facilityId, date);
+    // int countSoFar = patientRepository.countByFacilityId(facilityId);
     int countSoFar = patientRepository.countByGeoZoneId(facilityId);
     return facilityCode + "/" + datePart + "/" + String.format("%05d", countSoFar + 1);
   }
