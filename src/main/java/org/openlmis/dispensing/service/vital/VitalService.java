@@ -15,18 +15,23 @@
 
 package org.openlmis.dispensing.service.vital;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.openlmis.dispensing.domain.patient.Patient;
 import org.openlmis.dispensing.domain.vital.Vital;
+import org.openlmis.dispensing.dto.patient.PatientDto;
 import org.openlmis.dispensing.dto.vital.VitalDto;
 import org.openlmis.dispensing.exception.ResourceNotFoundException;
 import org.openlmis.dispensing.repository.patient.PatientRepository;
 import org.openlmis.dispensing.repository.vital.VitalRepository;
+import org.openlmis.dispensing.service.patient.PatientService;
 import org.openlmis.dispensing.util.Message;
+import org.openlmis.dispensing.util.VitalSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +43,8 @@ public class VitalService {
     private VitalRepository vitalRepository;
     @Autowired
     private PatientRepository patientRepository;
+    @Autowired
+    private PatientService patientService;
 
     /**
      * Update a Vital.
@@ -167,4 +174,38 @@ public class VitalService {
                 .map(this::vitalToDto)
                 .collect(Collectors.toList());
     }
+
+  /**
+  * Get a Vital based on parameters.
+  *
+  *
+  * @return a vitals dtos.
+  */
+  public List<VitalDto> searchVitals(String patientNumber) {
+
+    // First, find the patients based on the given patient details
+    List<PatientDto> patientDtos = patientService.searchPatientByPatientNumber(patientNumber);
+
+    if (patientDtos.isEmpty()) {
+      return new ArrayList<VitalDto>();
+    }
+
+    // Extract the patient IDs from the found patients and convert them to string
+    List<UUID> patientIds = patientDtos.stream()
+        .map(PatientDto::getId)
+        .collect(Collectors.toList());
+    // Create the Specification
+    Specification<Vital> spec = Specification
+        .where(VitalSpecification.patientIdIn(patientIds));
+
+    // Then, search for vitals based on the Specification
+    List<Vital> vitals = vitalRepository.findAll(spec);
+
+    // Convert Vital entities to VitalDto objects
+    return vitals == null ? new ArrayList<VitalDto>()
+        : vitals.stream()
+            .map(this::vitalToDto)
+            .collect(Collectors.toList());
+  }
+
 }

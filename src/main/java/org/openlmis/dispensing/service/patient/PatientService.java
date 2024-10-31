@@ -68,6 +68,21 @@ public class PatientService {
    * Search for patients.
    *
    * @param patientNumber unique patient number.
+   * @return List of patients matching the criteria.
+   */
+  @Transactional(readOnly = true)
+  public List<PatientDto> searchPatientByPatientNumber(String patientNumber) {
+    Specification<Patient> spec = PatientSpecifications.bySearchCriteria(patientNumber, null, null,
+        null, null, null, null);
+    return patientRepository.findAll(spec).stream()
+        .map(this::patientToDto)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Search for patients.
+   *
+   * @param patientNumber unique patient number.
    * @param firstName     patient first name.
    * @param lastName      patient last name.
    * @param dateOfBirth   patient date of birth.

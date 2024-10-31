@@ -27,6 +27,7 @@ schemas:
   - personDto: !include schemas/personDto.json
   - medicalHistoryDto: !include schemas/medicalHistoryDto.json
   - prescriptionDto: !include schemas/prescriptionDto.json
+  - vitalDto: !include schemas/vitalDto.json
   - pointOfDeliveryEventDto: !include schemas/pointOfDeliveryEventDto.json
   - pointOfDeliveryEventDtos: |
       {
@@ -42,6 +43,12 @@ schemas:
       {
           "type": "array",
           "items": {"type": "object", "$ref": "schemas/prescriptionDto.json"}
+      }
+  
+  - vitalDtos: |
+      {
+          "type": "array",
+          "items": {"type": "object", "$ref": "schemas/vitalDto.json"}
       }
 
   - validSourceDestination: !include schemas/validSourceDestination.json
@@ -455,3 +462,82 @@ traits:
             body:
               application/json:
                 schema: localizedMessage  
+
+  /vital:
+    /{id}:
+      delete:
+        is: [ secured ]
+        description: Void (soft delete) a Vital.
+
+        responses:
+          204:
+            description: Vital deleted.
+          400:
+            description: Vital  is not found.
+            body:
+              application/json:
+                schema: localizedMessage
+          403:
+            description: User does not have permission to delete a Vital.
+            body:
+              application/json:
+                schema: localizedMessage
+
+    get:
+      is: [ secured ]
+      description: Get a list of vitals given a patient Number
+      queryParameters:
+        patientNumber:
+          required: true
+
+      responses:
+        200:
+          description: |
+            Returns a default template with all fields set to not display when no query parameters are passed.
+
+            Returns template that matches patient number.
+          headers:
+            X-Content-Type-Options:
+            X-XSS-Protection:
+          body:
+            application/json:
+              schema: vitalDtos
+        404:
+          description: Vitals not found for the given query parameter.
+          body:
+            application/json:
+              schema: localizedMessage
+        400:
+          body:
+            application/json:
+              schema: localizedMessage
+          description: Provided query parameters are not correctly formatted.
+
+    post:
+      is: [ secured ]
+      description: Create a new Vital (vital capture).
+      body:
+        application/json:
+          schema: vitalDto
+
+      responses:
+        201:
+          description: Vital creation has been processed with no validation error or persistence error.
+          headers:
+            Keep-Alive:
+          body:
+            application/json:
+              schema: uuid
+
+        400:
+          description: Failed to process prescription due to validation error.
+          body:
+            application/json:
+              schema: localizedMessage
+
+        403:
+          description: User does not have permission to create prescription for given facility.
+          body:
+            application/json:
+              schema: localizedMessage
+    

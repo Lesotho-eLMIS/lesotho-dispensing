@@ -20,6 +20,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.util.List;
 import java.util.UUID;
 import org.openlmis.dispensing.dto.vital.VitalDto;
 import org.openlmis.dispensing.service.vital.VitalService;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -102,4 +104,25 @@ public class VitalController extends BaseController {
         VitalDto updatedVital = vitalService.updateVital(id, dto);
         return new ResponseEntity<>(updatedVital, OK);
     }
+
+    /**
+     * Get vitals based on parameters.
+     *
+     * @return List of all vitals.
+     */
+    @GetMapping
+    @ResponseStatus
+    @ResponseBody
+    // @RequestMapping(value = "/vitals", method = RequestMethod.GET)
+    public ResponseEntity<List<VitalDto>> getVitals(
+            @RequestParam(required = false) String patientNumber) {
+
+        // Call the service method to search for vitals
+        List<VitalDto> vitalDtos = vitalService.searchVitals(
+                patientNumber);
+
+        // Return the response entity with the list of VitalDto
+        return ResponseEntity.ok(vitalDtos);
+    }
+
 }

@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "description": "Vital",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "patientId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "height": {
+      "type": "number"
+    },
+    "weight": {
+      "type": "number"
+    },
+    "muac": {
+      "type": "number"
+    },
+    "systolic": {
+      "type": "number"
+    },
+    "diastolic": {
+      "type": "number"
+    },
+    "tbstatus": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "patientId"
+  ]
+}
