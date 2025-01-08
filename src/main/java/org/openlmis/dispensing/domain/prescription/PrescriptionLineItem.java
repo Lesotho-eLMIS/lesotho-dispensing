@@ -44,7 +44,7 @@ import org.openlmis.dispensing.domain.status.PrescriptionLineItemStatus;
 public class PrescriptionLineItem extends BaseEntity {
   
   //Prescription create attributes
-  private Integer dose;
+  private Double dose;
   private String doseUnits;
   private String doseFrequency;
   private String route;
@@ -78,7 +78,7 @@ public class PrescriptionLineItem extends BaseEntity {
   /**
    * Constructor for PrescriptionLineItem.
    */
-  public PrescriptionLineItem(Integer dose, String doseUnits, String doseFrequency, String route,
+  public PrescriptionLineItem(Double dose, String doseUnits, String doseFrequency, String route,
       Integer duration, String durationUnits, String additionalInstructions, UUID orderablePrescribed,
       Integer quantityPrescribed, UUID orderableDispensed, UUID lotId, Integer quantityDispensed,
       Integer remainingBalance, Boolean servedExternally, String comments, LocalDate collectBalanceDate) {

@@ -30,7 +30,7 @@ import org.openlmis.dispensing.domain.status.PrescriptionLineItemStatus;
 @Builder
 public class PrescriptionLineItemDto {
   private UUID id;
-  private Integer dose;
+  private Double dose;
   private String doseUnits;
   private String doseFrequency;
   private String route;
